@@ -551,6 +551,7 @@
 
           const idxAno = findColIdx(['ano']);
           const idxProponente = findColIdx(['proponente', 'nome']);
+          const idxParlamentar = findColIdx(['parlamentar', 'deputado', 'senador', 'autor']);
           const idxUF = findColIdx(['uf']);
           const idxInstrumento = findColIdx(['instrumento', 'número', 'numero', 'nº']);
           const idxModalidade = findColIdx(['modalidade', 'mod', 'mod. aplic', 'mod.aplic.']);
@@ -572,6 +573,7 @@
             const proponente = idxProponente !== -1 ? String(row[idxProponente] || '').trim() : '';
             if (!proponente || proponente.toLowerCase().includes('total') || proponente.toLowerCase().includes('nome do proponente')) continue;
 
+            const parlamentar = idxParlamentar !== -1 ? String(row[idxParlamentar] || '-').trim() : '-';
             const uf = idxUF !== -1 ? String(row[idxUF] || 'BR').trim().toUpperCase() : 'BR';
             const anoCelebracao = idxAno !== -1 ? String(row[idxAno] || currentYear).split('.')[0].trim() : String(currentYear);
             const codInst = idxInstrumento !== -1 ? String(row[idxInstrumento] || '').trim() : '';
@@ -620,6 +622,7 @@
               codInst: codInst || instrumento,
               rp: rpVal || 'RP Não Ind.',
               proponente,
+              parlamentar: parlamentar || '-',
               numSEI: numSEI || '-',
               codPrograma,
               inicioVigencia: inicioVig || '-',
@@ -784,6 +787,7 @@
           if (filterFaltaRepassar && item.empenho <= item.repassado) return false;
 
           if (search && !item.proponente.toLowerCase().includes(search.toLowerCase()) && 
+              !item.parlamentar.toLowerCase().includes(search.toLowerCase()) && 
               !item.obs.toLowerCase().includes(search.toLowerCase()) && 
               !item.numSEI.toLowerCase().includes(search.toLowerCase()) &&
               !item.codPrograma.toLowerCase().includes(search.toLowerCase())) return false;
@@ -1357,7 +1361,7 @@
 
                       <input
                         type="text"
-                        placeholder="Buscar proponente, SEI, obs..."
+                        placeholder="Buscar proponente, parlamentar, SEI..."
                         value={search}
                         onChange={(e) => { setSearch(e.target.value); setCurrentPage(1); }}
                         className={`border rounded-xl px-4 py-1.5 text-xs focus:outline-none focus:border-blue-500 w-full sm:w-64 ${isLightMode ? 'bg-white border-slate-300 text-slate-800' : 'bg-slate-950 border-slate-800 text-white'}`}
@@ -1665,6 +1669,9 @@
                         <th onClick={() => handleSort('numSEI')} className="p-3 text-center cursor-pointer hover:text-blue-500">
                           Nº SEI {sortConfig.key === 'numSEI' ? (sortConfig.direction === 'asc' ? '▲' : '▼') : ''}
                         </th>
+                        <th onClick={() => handleSort('parlamentar')} className="p-3 text-center cursor-pointer hover:text-blue-500">
+                          Parlamentar {sortConfig.key === 'parlamentar' ? (sortConfig.direction === 'asc' ? '▲' : '▼') : ''}
+                        </th>
                         <th onClick={() => handleSort('uf')} className="p-3 text-center cursor-pointer hover:text-blue-500">
                           UF {sortConfig.key === 'uf' ? (sortConfig.direction === 'asc' ? '▲' : '▼') : ''}
                         </th>
@@ -1699,6 +1706,7 @@
                             </div>
                           </td>
                           <td className="p-3 text-center font-mono text-cyan-500 font-medium whitespace-nowrap">{item.numSEI}</td>
+                          <td className="p-3 text-center font-medium text-amber-400 whitespace-nowrap">{item.parlamentar}</td>
                           <td className="p-3 text-center font-bold">{item.uf}</td>
                           <td className="p-3 text-center whitespace-nowrap print-hide-col">{item.inicioVigencia}</td>
                           <td className="p-3 text-center whitespace-nowrap">
