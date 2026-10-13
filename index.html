@@ -499,6 +499,7 @@
 
       const currentYear = new Date().getFullYear();
 
+      // PARSER ROBUSTO DE DADOS DA PLANILHA
       const processWorkbook = (wb, sourceName = 'Planilha de Emendas - Resumida.xlsx') => {
         let allRows = [];
         let budgetMap = {};
@@ -548,21 +549,21 @@
           const findColIdx = (terms) => headers.findIndex(h => terms.some(t => h.includes(t)));
 
           const idxAno = findColIdx(['ano']);
-          const idxProponente = findColIdx(['proponente', 'nome']);
+          const idxProponente = findColIdx(['proponente', 'nome', 'convenente']);
           const idxParlamentar = findColIdx(['parlamentar', 'deputado', 'senador', 'autor']);
-          const idxUF = findColIdx(['uf']);
-          const idxInstrumento = findColIdx(['instrumento', 'número', 'numero', 'nº']);
-          const idxModalidade = findColIdx(['modalidade', 'mod', 'mod. aplic', 'mod.aplic.']);
+          const idxUF = findColIdx(['uf', 'estado']);
+          const idxInstrumento = findColIdx(['instrumento', 'número', 'numero', 'nº', 'convênio']);
+          const idxModalidade = findColIdx(['modalidade', 'mod', 'mod. aplic', 'mod.aplic.', 'rp']);
           const idxSEI = findColIdx(['nº sei', 'sei', 'numero sei', 'número sei', 'processo sei', 'processo']);
           const idxPrograma = findColIdx(['código do programa', 'codigo do programa', 'cod. programa', 'programa']);
           const idxInicioVigencia = findColIdx(['início da vigência', 'inicio da vigencia', 'início vigência', 'inicio vigencia', 'data início', 'data inicio']);
           const idxFimVigencia = findColIdx(['fim da vigência', 'fim da vigencia', 'término vigência', 'termino vigencia', 'data fim', 'término', 'termino']);
           const idxRepasseProposta = findColIdx(['valor de repasse da proposta', 'repasse da proposta', 'valor repasse', 'valor de repasse']);
-          const idxGlobal = findColIdx(['valor global', 'total do plano', 'valor total']);
+          const idxGlobal = findColIdx(['valor global', 'total do plano', 'valor total', 'valor']);
           const idxEmpenho = findColIdx(['empenho', 'valor do empenho']);
-          const idxRepassado = findColIdx(['repassado', 'valor já repassado']);
+          const idxRepassado = findColIdx(['repassado', 'valor já repassado', 'pago']);
           const idxDataRepasse = findColIdx(['data do repasse', 'data repasse', 'data de pagamento', 'data pagamento', 'ano repasse']);
-          const idxObs = findColIdx(['motivo', 'situação', 'observações', 'status']);
+          const idxObs = findColIdx(['motivo', 'situação', 'observações', 'status', 'observacao']);
 
           for (let r = headerIdx + 1; r < matrix.length; r++) {
             const row = matrix[r];
@@ -571,24 +572,33 @@
             const proponente = idxProponente !== -1 ? String(row[idxProponente] || '').trim() : '';
             if (!proponente || proponente.toLowerCase().includes('total') || proponente.toLowerCase().includes('nome do proponente')) continue;
 
-            const parlamentar = idxParlamentar !== -1 ? String(row[idxParlamentar] || '-').trim() : '-';
-            const uf = idxUF !== -1 ? String(row[idxUF] || 'BR').trim().toUpperCase() : 'BR';
-            const anoCelebracao = idxAno !== -1 ? String(row[idxAno] || currentYear).split('.')[0].trim() : String(currentYear);
-            const codInst = idxInstrumento !== -1 ? String(row[idxInstrumento] || '').trim() : '';
-            const numSEI = idxSEI !== -1 ? String(row[idxSEI] || '-').trim() : '-';
+            const globalVal = idxGlobal !== -1 ? parseVal(row[idxGlobal]) : 0;
+            const repassePropostaVal = idxRepasseProposta !== -1 ? parseVal(row[idxRepasseProposta]) : globalVal;
+            let empenhoVal = instrumento === 'TED' ? globalVal : (idxEmpenho !== -1 ? parseVal(row[idxEmpenho]) : 0);
+            const repassadoVal = idxRepassado !== -1 ? parseVal(row[idxRepassado]) : 0;
+
+            // IGNORA LINHAS VAZIAS OU ZERADAS DE RASCUNHO NA PLANILHA
+            if (globalVal === 0 && empenhoVal === 0 && repassadoVal === 0 && (!proponente || proponente === '-')) {
+              continue;
+            }
+
+            const parlamentar = idxParlamentar !== -1 && row[idxParlamentar] ? String(row[idxParlamentar]).trim() : '-';
+            const uf = idxUF !== -1 && row[idxUF] ? String(row[idxUF]).trim().toUpperCase() : 'BR';
+            const anoCelebracao = idxAno !== -1 && row[idxAno] ? String(row[idxAno]).split('.')[0].trim() : String(currentYear);
+            const codInst = idxInstrumento !== -1 && row[idxInstrumento] ? String(row[idxInstrumento]).trim() : '';
+            const numSEI = idxSEI !== -1 && row[idxSEI] ? String(row[idxSEI]).trim() : '-';
             
-            let rawPrograma = idxPrograma !== -1 ? String(row[idxPrograma] || '').trim() : '';
+            let rawPrograma = idxPrograma !== -1 && row[idxPrograma] ? String(row[idxPrograma]).trim() : '';
             let codPrograma = rawPrograma && rawPrograma !== '-' ? rawPrograma : (instrumento === 'TED' ? 'TED' : 'Sem Programa');
 
             const inicioVig = idxInicioVigencia !== -1 ? fmtDate(row[idxInicioVigencia]) : '-';
             const fimVig = idxFimVigencia !== -1 ? fmtDate(row[idxFimVigencia]) : '-';
             
-            const repassadoVal = idxRepassado !== -1 ? parseVal(row[idxRepassado]) : 0;
             const rawDataRepasse = idxDataRepasse !== -1 ? row[idxDataRepasse] : '';
             const dataRepasseFmt = rawDataRepasse ? fmtDate(rawDataRepasse) : '-';
             const anoRepasseReal = repassadoVal > 0 ? extractYear(rawDataRepasse, anoCelebracao) : '-';
 
-            let rawModalidade = idxModalidade !== -1 ? String(row[idxModalidade] || '').trim() : '';
+            let rawModalidade = idxModalidade !== -1 && row[idxModalidade] ? String(row[idxModalidade]).trim() : '';
             let rpVal = '';
 
             if (rawModalidade) {
@@ -598,10 +608,7 @@
               else rpVal = rawModalidade.toUpperCase().startsWith('RP') ? rawModalidade.toUpperCase() : `RP ${rawModalidade}`;
             }
 
-            const globalVal = idxGlobal !== -1 ? parseVal(row[idxGlobal]) : 0;
-            const repassePropostaVal = idxRepasseProposta !== -1 ? parseVal(row[idxRepasseProposta]) : globalVal;
-            let empenhoVal = instrumento === 'TED' ? globalVal : (idxEmpenho !== -1 ? parseVal(row[idxEmpenho]) : 0);
-            const obsVal = idxObs !== -1 ? String(row[idxObs] || '-').trim() : '-';
+            const obsVal = idxObs !== -1 && row[idxObs] ? String(row[idxObs]).trim() : '-';
 
             const fimVigObj = parseDateObj(fimVig);
             let diasParaVencer = null;
