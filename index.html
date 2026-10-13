@@ -499,7 +499,7 @@
 
       const currentYear = new Date().getFullYear();
 
-      // PARSER COMPLETO E SEGURO
+      // PARSER DA PLANILHA COM FILTRO ESTRITO DE DADOS ZERADOS
       const processWorkbook = (wb, sourceName = 'Planilha de Emendas - Resumida.xlsx') => {
         let allRows = [];
         let budgetMap = {};
@@ -575,8 +575,12 @@
             let empenhoVal = instrumento === 'TED' ? globalVal : (idxEmpenho !== -1 ? parseVal(row[idxEmpenho]) : 0);
             const repassadoVal = idxRepassado !== -1 ? parseVal(row[idxRepassado]) : 0;
 
-            // FILTRAGEM RIGOROSA: descarta linhas totalmente sem dados da planilha
-            if ((!proponente || proponente === '-' || proponente.toLowerCase().includes('total') || proponente.toLowerCase().includes('nome do proponente')) && globalVal === 0 && empenhoVal === 0 && repassadoVal === 0) {
+            // ELIMINA DADOS ZERADOS FANTASMA (RASCUNHOS OU LINHAS DE MODELO DA PLANILHA)
+            if (globalVal === 0 && empenhoVal === 0 && repassadoVal === 0) {
+              continue;
+            }
+
+            if (!proponente || proponente === '-' || proponente.toLowerCase().includes('total') || proponente.toLowerCase().includes('nome do proponente')) {
               continue;
             }
 
@@ -651,41 +655,43 @@
         setFileName(sourceName);
       };
 
-      // TENTATIVAS MÚLTIPLAS COM MULTI-PATH PARA O VERCEL (SOLUÇÃO CASE SENSITIVE)
+      // TENTATIVA COMPATÍVEL COM URLS DO VERCEL E NORMAS DE HOSPEDAGEM WEB
       useEffect(() => {
         if (!isAuthenticated) return;
 
         const loadDefaultSheet = async () => {
           setIsLoading(true);
-          const posiblesNombres = [
-            './Planilha de Emendas - Resumida.xlsx',
-            './planilha-de-emendas-resumida.xlsx',
-            './planilha_de_emendas_resumida.xlsx',
-            './Planilha_de_Emendas_Resumida.xlsx',
-            './Planilha de Emendas.xlsx',
-            './planilha.xlsx'
+
+          const nomesArquivos = [
+            'Planilha de Emendas - Resumida.xlsx',
+            'planilha-de-emendas-resumida.xlsx',
+            'Planilha_de_Emendas_Resumida.xlsx',
+            'planilha.xlsx'
           ];
 
-          let success = false;
+          let carregado = false;
 
-          for (const path of posiblesNombres) {
+          for (const nome of nomesArquivos) {
             try {
-              const response = await fetch(path);
+              // Converte caminhos com espaço para URL Vercel segura (%20)
+              const urlEncoded = `./${encodeURIComponent(nome)}`;
+              const response = await fetch(urlEncoded);
               if (response.ok) {
                 const arrayBuffer = await response.arrayBuffer();
                 const wb = XLSX.read(arrayBuffer, { type: 'array' });
-                processWorkbook(wb, path.replace('./', ''));
-                success = true;
+                processWorkbook(wb, nome);
+                carregado = true;
                 break;
               }
             } catch (err) {
-              // continua para o próximo nome
+              // Tenta o próximo nome
             }
           }
 
-          if (!success) {
-            console.warn('Nenhum arquivo padrão encontrado na pasta pública do servidor.');
+          if (!carregado) {
+            console.log('Sem planilha padrão disponível no Vercel. Utilize o botão para subir o arquivo manualmente.');
           }
+
           setIsLoading(false);
         };
 
@@ -1411,7 +1417,7 @@
               <div className="text-6xl animate-bounce">📊</div>
               <h2 className="text-2xl font-bold">Nenhuma Planilha Carregada</h2>
               <p className={`text-sm max-w-md mx-auto ${isLightMode ? 'text-slate-600' : 'text-slate-400'}`}>
-                Envie a planilha de dados pelo botão verde superior para alimentar o painel ou certifique-se de nomear o arquivo no GitHub para <strong>Planilha de Emendas - Resumida.xlsx</strong>.
+                Envie a planilha de dados pelo botão verde superior para alimentar o painel ou certifique-se de que o arquivo no GitHub se chama <strong>Planilha de Emendas - Resumida.xlsx</strong>.
               </p>
             </div>
           ) : (
