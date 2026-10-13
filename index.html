@@ -6,15 +6,14 @@
   <title>Painel Executivo de Monitoramento - MTur</title>
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- SheetJS para ler Excel -->
+  <!-- SheetJS para ler e gerar Excel -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <!-- React & ReactDOM -->
   <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-  <!-- Chart.js & Chartjs-Plugin-Datalabels -->
+  <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
   <style>
     .uf-path {
       transition: all 0.3s ease-in-out;
@@ -51,7 +50,7 @@
     @media print {
       @page {
         size: A4 landscape;
-        margin: 10mm;
+        margin: 8mm;
       }
       
       body {
@@ -114,7 +113,7 @@
 
       th, td {
         border-bottom: 1px solid #cbd5e1 !important;
-        padding: 6px !important;
+        padding: 5px !important;
       }
 
       thead {
@@ -128,10 +127,6 @@
 
   <script type="text/babel">
     const { useState, useMemo, useEffect, useRef } = React;
-
-    if (window.ChartDataLabels) {
-      Chart.register(ChartDataLabels);
-    }
 
     const fmtR$ = (val) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(val || 0);
 
@@ -473,10 +468,12 @@
 
       const [filterTab, setFilterTab] = useState('ALL');
       const [filterAno, setFilterAno] = useState('ALL');
-      const [filterAnoRepasse, setFilterAnoRepasse] = useState(String(new Date().getFullYear()));
+      const [filterAnoRepasse, setFilterAnoRepasse] = useState('ALL');
       const [selectedUFs, setSelectedUFs] = useState([]);
       const [selectedProgramas, setSelectedProgramas] = useState([]);
+      const [selectedParlamentares, setSelectedParlamentares] = useState([]);
       const [filterRP, setFilterRP] = useState('ALL');
+      const [filterFaixaValor, setFilterFaixaValor] = useState('ALL');
       const [filterVigenciaAlerta, setFilterVigenciaAlerta] = useState('ALL');
       const [filterFaltaRepassar, setFilterFaltaRepassar] = useState(false);
       const [search, setSearch] = useState('');
@@ -492,15 +489,16 @@
       const chartTypeRef = useRef(null);
       const chartProgramRef = useRef(null);
       const chartRpRef = useRef(null);
+      const chartParlamentarRef = useRef(null);
 
       const instanceUf = useRef(null);
       const instanceType = useRef(null);
       const instanceProgram = useRef(null);
       const instanceRp = useRef(null);
+      const instanceParlamentar = useRef(null);
 
       const currentYear = new Date().getFullYear();
 
-      // FUNÇÃO PRINCIPAL QUE PROCESSA QUALQUER PLANILHA
       const processWorkbook = (wb, sourceName = 'Planilha de Emendas - Resumida.xlsx') => {
         let allRows = [];
         let budgetMap = {};
@@ -648,7 +646,6 @@
         setFileName(sourceName);
       };
 
-      // TENTA CARREGAR A PLANILHA PADRÃO AUTOMATICAMENTE PELO NOME ESPECÍFICO
       useEffect(() => {
         if (!isAuthenticated) return;
 
@@ -763,7 +760,9 @@
         setFilterAnoRepasse('ALL');
         setSelectedUFs([]);
         setSelectedProgramas([]);
+        setSelectedParlamentares([]);
         setFilterRP('ALL');
+        setFilterFaixaValor('ALL');
         setFilterVigenciaAlerta('ALL');
         setFilterFaltaRepassar(false);
         setSearch('');
@@ -777,8 +776,13 @@
           if (filterAnoRepasse !== 'ALL' && item.anoRepasse !== filterAnoRepasse) return false;
           if (selectedUFs.length > 0 && !selectedUFs.includes(item.uf)) return false;
           if (selectedProgramas.length > 0 && !selectedProgramas.includes(item.codPrograma)) return false;
+          if (selectedParlamentares.length > 0 && !selectedParlamentares.includes(item.parlamentar)) return false;
           if (filterRP !== 'ALL' && item.rp !== filterRP) return false;
           
+          if (filterFaixaValor === '500K' && item.global > 500000) return false;
+          if (filterFaixaValor === '500K_2M' && (item.global <= 500000 || item.global > 2000000)) return false;
+          if (filterFaixaValor === '2M' && item.global <= 2000000) return false;
+
           if (filterVigenciaAlerta === 'ALERTA' && !item.alertaVigencia) return false;
           if (filterVigenciaAlerta === '30' && (item.diasParaVencer === null || item.diasParaVencer < 0 || item.diasParaVencer > 30)) return false;
           if (filterVigenciaAlerta === '60' && (item.diasParaVencer === null || item.diasParaVencer <= 30 || item.diasParaVencer > 60)) return false;
@@ -793,7 +797,7 @@
               !item.codPrograma.toLowerCase().includes(search.toLowerCase())) return false;
           return true;
         });
-      }, [data, filterTab, filterAno, filterAnoRepasse, selectedUFs, selectedProgramas, filterRP, filterVigenciaAlerta, filterFaltaRepassar, search]);
+      }, [data, filterTab, filterAno, filterAnoRepasse, selectedUFs, selectedProgramas, selectedParlamentares, filterRP, filterFaixaValor, filterVigenciaAlerta, filterFaltaRepassar, search]);
 
       const sortedData = useMemo(() => {
         let sorted = [...filteredData];
@@ -827,6 +831,85 @@
           key,
           direction: prev.key === key && prev.direction === 'asc' ? 'desc' : 'asc'
         }));
+      };
+
+      const renderSortIndicator = (key) => {
+        const active = sortConfig.key === key;
+        return (
+          <span className={`ml-1 text-[10px] font-black inline-flex items-center px-1 rounded ${
+            active ? 'bg-sky-500 text-white shadow-sm' : 'text-slate-500 opacity-60'
+          }`}>
+            {active ? (sortConfig.direction === 'asc' ? '▲' : '▼') : '↕'}
+          </span>
+        );
+      };
+
+      const handleExportExcel = () => {
+        if (!sortedData || sortedData.length === 0) {
+          alert('Nenhum dado filtrado para exportar.');
+          return;
+        }
+
+        const rows = sortedData.map(d => ({
+          'Ano Celebração': d.ano,
+          'Ano Repasse': d.anoRepasse,
+          'Instrumento': d.instrumento,
+          'Código': d.codInst,
+          'Modalidade': d.rp,
+          'Proponente': d.proponente,
+          'Parlamentar': d.parlamentar,
+          'Nº SEI': d.numSEI,
+          'UF': d.uf,
+          'Início Vigência': d.inicioVigencia,
+          'Fim Vigência': d.fimVigencia,
+          'Dias para Vencer': d.diasParaVencer !== null ? d.diasParaVencer : '-',
+          'Valor Global': d.global,
+          'Valor Empenhado': d.empenho,
+          'Valor Repassado': d.repassado,
+          'Falta Repassar': Math.max(0, d.empenho - d.repassado),
+          'Programa': d.codPrograma,
+          'Observação / Situação': d.obs
+        }));
+
+        const worksheet = XLSX.utils.json_to_sheet(rows);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, 'Emendas Filtradas');
+        XLSX.writeFile(workbook, `Emendas_MTur_Filtradas_${new Date().toISOString().slice(0,10)}.xlsx`);
+      };
+
+      const getRiskStatus = (item) => {
+        if (item.diasParaVencer !== null) {
+          if (item.diasParaVencer < 0) {
+            return {
+              bg: isLightMode ? 'bg-rose-100/90 border-rose-300 text-rose-900' : 'bg-rose-950/40 border-rose-800 text-rose-200',
+              badgeBg: 'bg-rose-600 text-white',
+              label: 'Vencido',
+              icon: '🚨'
+            };
+          }
+          if (item.diasParaVencer <= 30) {
+            return {
+              bg: isLightMode ? 'bg-amber-100/90 border-amber-300 text-amber-900' : 'bg-amber-950/40 border-amber-800 text-amber-200',
+              badgeBg: 'bg-amber-600 text-white',
+              label: `Crítico (${item.diasParaVencer}d)`,
+              icon: '⚠️'
+            };
+          }
+          if (item.diasParaVencer <= 90) {
+            return {
+              bg: isLightMode ? 'bg-yellow-50/80 border-yellow-200 text-yellow-900' : 'bg-yellow-950/20 border-yellow-900/40 text-yellow-200',
+              badgeBg: 'bg-yellow-500 text-black font-bold',
+              label: `Atenção (${item.diasParaVencer}d)`,
+              icon: '⚡'
+            };
+          }
+        }
+        return {
+          bg: isLightMode ? 'bg-emerald-50/50 border-emerald-200/60 text-slate-800' : 'bg-slate-900/40 border-slate-800/80 text-slate-200',
+          badgeBg: 'bg-emerald-600/20 text-emerald-400 border border-emerald-500/30',
+          label: item.diasParaVencer !== null ? `${item.diasParaVencer}d` : 'Regular',
+          icon: '🟢'
+        };
       };
 
       const handleToggleUFMap = (uf) => {
@@ -874,6 +957,7 @@
       const anosRepasseDisponiveis = useMemo(() => Array.from(new Set([...data.map(d => d.anoRepasse).filter(a => a && a !== '-'), ...Object.keys(budgets)])).sort(), [data, budgets]);
       const rpsDisponiveis = useMemo(() => Array.from(new Set(data.map(d => d.rp).filter(Boolean))).sort(), [data]);
       const programasDisponiveis = useMemo(() => Array.from(new Set(data.map(d => d.codPrograma).filter(p => p && p !== '-'))).sort(), [data]);
+      const parlamentaresDisponiveis = useMemo(() => Array.from(new Set(data.map(d => d.parlamentar).filter(p => p && p !== '-'))).sort(), [data]);
 
       const chartConfigs = useMemo(() => {
         if (!isAuthenticated || filteredData.length === 0) return {};
@@ -900,9 +984,7 @@
           boxPadding: 6,
           usePointStyle: true,
           callbacks: {
-            title: (items) => {
-              return items && items.length > 0 ? items[0].label : '';
-            },
+            title: (items) => items && items.length > 0 ? items[0].label : '',
             label: (context) => {
               const key = context.label;
               const item = dataMap[key] || { global: 0, empenho: 0, repassado: 0, faltaRepassar: 0 };
@@ -913,22 +995,18 @@
                 `  Falta Repassar: ${fmtR$(item.faltaRepassar)}`
               ];
             },
-            labelColor: (context) => {
-              return {
-                borderColor: 'transparent',
-                backgroundColor: context.dataIndex === 0 ? '#0284c7' : context.dataIndex === 1 ? '#f59e0b' : context.dataIndex === 2 ? '#10b981' : '#f43f5e',
-                borderWidth: 0,
-                borderRadius: 4
-              };
-            }
+            labelColor: (context) => ({
+              borderColor: 'transparent',
+              backgroundColor: context.dataIndex === 0 ? '#0284c7' : context.dataIndex === 1 ? '#f59e0b' : context.dataIndex === 2 ? '#10b981' : '#f43f5e',
+              borderWidth: 0,
+              borderRadius: 4
+            })
           }
         });
 
         const ufMetricsMap = {};
         filteredData.forEach(d => {
-          if (!ufMetricsMap[d.uf]) {
-            ufMetricsMap[d.uf] = { global: 0, empenho: 0, repassado: 0 };
-          }
+          if (!ufMetricsMap[d.uf]) ufMetricsMap[d.uf] = { global: 0, empenho: 0, repassado: 0 };
           ufMetricsMap[d.uf].global += d.global;
           ufMetricsMap[d.uf].empenho += d.empenho;
           ufMetricsMap[d.uf].repassado += d.repassado;
@@ -943,56 +1021,24 @@
           data: { 
             labels: sortedUfs, 
             datasets: [
-              { 
-                label: 'Volume Global', 
-                data: sortedUfs.map(uf => ufMetricsMap[uf].global), 
-                backgroundColor: '#0284c7', 
-                borderRadius: 4 
-              },
-              { 
-                label: 'Empenhado', 
-                data: sortedUfs.map(uf => ufMetricsMap[uf].empenho), 
-                backgroundColor: '#f59e0b', 
-                borderRadius: 4 
-              },
-              { 
-                label: 'Repassado', 
-                data: sortedUfs.map(uf => ufMetricsMap[uf].repassado), 
-                backgroundColor: '#10b981', 
-                borderRadius: 4 
-              },
-              { 
-                label: 'Falta Repassar', 
-                data: sortedUfs.map(uf => Math.max(0, ufMetricsMap[uf].empenho - ufMetricsMap[uf].repassado)), 
-                backgroundColor: '#f43f5e', 
-                borderRadius: 4 
-              }
+              { label: 'Volume Global', data: sortedUfs.map(uf => ufMetricsMap[uf].global), backgroundColor: '#0284c7', borderRadius: 4 },
+              { label: 'Empenhado', data: sortedUfs.map(uf => ufMetricsMap[uf].empenho), backgroundColor: '#f59e0b', borderRadius: 4 },
+              { label: 'Repassado', data: sortedUfs.map(uf => ufMetricsMap[uf].repassado), backgroundColor: '#10b981', borderRadius: 4 },
+              { label: 'Falta Repassar', data: sortedUfs.map(uf => Math.max(0, ufMetricsMap[uf].empenho - ufMetricsMap[uf].repassado)), backgroundColor: '#f43f5e', borderRadius: 4 }
             ] 
           },
           options: { 
             responsive: true, 
             maintainAspectRatio: false, 
             clip: false,
-            layout: { padding: { top: 10, left: 10, right: 10 } },
+            layout: { padding: { top: 15, left: 10, right: 10 } },
             plugins: { 
-              legend: { 
-                display: true, 
-                position: 'top', 
-                labels: { color: textColor, font: { size: 10 }, boxWidth: 12 } 
-              },
-              tooltip: { callbacks: { label: tooltipCallback } },
-              datalabels: { display: false }
+              legend: { display: true, position: 'top', labels: { color: textColor, font: { size: 10 }, boxWidth: 12 } },
+              tooltip: { callbacks: { label: tooltipCallback } }
             }, 
             scales: { 
-              x: { 
-                ticks: { color: textColor, maxRotation: 0, minRotation: 0 },
-                grid: { display: false }
-              }, 
-              y: { 
-                grace: '5%',
-                ticks: { color: textColor, callback: (val) => formatMillionsAxis(val) }, 
-                grid: { color: gridColor } 
-              } 
+              x: { ticks: { color: textColor, maxRotation: 0, minRotation: 0 }, grid: { display: false } }, 
+              y: { grace: '10%', ticks: { color: textColor, callback: (val) => formatMillionsAxis(val) }, grid: { color: gridColor } } 
             },
             onClick: (e, elements) => {
               if (elements.length > 0) {
@@ -1003,11 +1049,62 @@
           }
         };
 
+        const parlMetricsMap = {};
+        filteredData.forEach(d => {
+          const parl = d.parlamentar || 'Não informado';
+          if (!parlMetricsMap[parl]) parlMetricsMap[parl] = { global: 0, empenho: 0, repassado: 0 };
+          parlMetricsMap[parl].global += d.global;
+          parlMetricsMap[parl].empenho += d.empenho;
+          parlMetricsMap[parl].repassado += d.repassado;
+        });
+
+        const sortedParls = Object.keys(parlMetricsMap)
+          .sort((a, b) => parlMetricsMap[b].global - parlMetricsMap[a].global)
+          .slice(0, 5);
+
+        const configParlamentar = {
+          type: 'bar',
+          data: {
+            labels: sortedParls,
+            datasets: [
+              { label: 'Volume Global', data: sortedParls.map(p => parlMetricsMap[p].global), backgroundColor: '#0284c7', borderRadius: 4 },
+              { label: 'Empenhado', data: sortedParls.map(p => parlMetricsMap[p].empenho), backgroundColor: '#f59e0b', borderRadius: 4 },
+              { label: 'Repassado', data: sortedParls.map(p => parlMetricsMap[p].repassado), backgroundColor: '#10b981', borderRadius: 4 },
+              { label: 'Falta Repassar', data: sortedParls.map(p => Math.max(0, parlMetricsMap[p].empenho - parlMetricsMap[p].repassado)), backgroundColor: '#f43f5e', borderRadius: 4 }
+            ]
+          },
+          options: {
+            indexAxis: 'y',
+            responsive: true,
+            maintainAspectRatio: false,
+            layout: { padding: { right: 25 } },
+            plugins: {
+              legend: { display: true, position: 'top', labels: { color: textColor, font: { size: 10 }, boxWidth: 12 } },
+              tooltip: { callbacks: { label: tooltipCallback } }
+            },
+            scales: {
+              x: {
+                grace: '15%',
+                ticks: { color: textColor, callback: (val) => formatMillionsAxis(val) },
+                grid: { color: gridColor }
+              },
+              y: {
+                ticks: { color: textColor, font: { size: 10, weight: 'bold' } },
+                grid: { display: false }
+              }
+            },
+            onClick: (e, elements) => {
+              if (elements.length > 0) {
+                const clickedParl = sortedParls[elements[0].index];
+                setSelectedParlamentares(prev => prev.includes(clickedParl) ? prev.filter(p => p !== clickedParl) : [...prev, clickedParl]);
+              }
+            }
+          }
+        };
+
         const progMetricsMap = {};
         filteredData.forEach(d => {
-          if (!progMetricsMap[d.codPrograma]) {
-            progMetricsMap[d.codPrograma] = { global: 0, empenho: 0, repassado: 0 };
-          }
+          if (!progMetricsMap[d.codPrograma]) progMetricsMap[d.codPrograma] = { global: 0, empenho: 0, repassado: 0 };
           progMetricsMap[d.codPrograma].global += d.global;
           progMetricsMap[d.codPrograma].empenho += d.empenho;
           progMetricsMap[d.codPrograma].repassado += d.repassado;
@@ -1022,55 +1119,23 @@
           data: { 
             labels: sortedProgs, 
             datasets: [
-              { 
-                label: 'Volume Global', 
-                data: sortedProgs.map(p => progMetricsMap[p].global), 
-                backgroundColor: '#0284c7', 
-                borderRadius: 4 
-              },
-              { 
-                label: 'Empenhado', 
-                data: sortedProgs.map(p => progMetricsMap[p].empenho), 
-                backgroundColor: '#f59e0b', 
-                borderRadius: 4 
-              },
-              { 
-                label: 'Repassado', 
-                data: sortedProgs.map(p => progMetricsMap[p].repassado), 
-                backgroundColor: '#10b981', 
-                borderRadius: 4 
-              },
-              { 
-                label: 'Falta Repassar', 
-                data: sortedProgs.map(p => Math.max(0, progMetricsMap[p].empenho - progMetricsMap[p].repassado)), 
-                backgroundColor: '#f43f5e', 
-                borderRadius: 4 
-              }
+              { label: 'Volume Global', data: sortedProgs.map(p => progMetricsMap[p].global), backgroundColor: '#0284c7', borderRadius: 4 },
+              { label: 'Empenhado', data: sortedProgs.map(p => progMetricsMap[p].empenho), backgroundColor: '#f59e0b', borderRadius: 4 },
+              { label: 'Repassado', data: sortedProgs.map(p => progMetricsMap[p].repassado), backgroundColor: '#10b981', borderRadius: 4 },
+              { label: 'Falta Repassar', data: sortedProgs.map(p => Math.max(0, progMetricsMap[p].empenho - progMetricsMap[p].repassado)), backgroundColor: '#f43f5e', borderRadius: 4 }
             ] 
           },
           options: { 
             indexAxis: 'y', 
             responsive: true, 
             maintainAspectRatio: false, 
+            layout: { padding: { right: 25 } },
             plugins: { 
-              legend: { 
-                display: true, 
-                position: 'top', 
-                labels: { color: textColor, font: { size: 10 }, boxWidth: 12 } 
-              },
-              tooltip: { callbacks: { label: tooltipCallback } },
-              datalabels: { display: false }
+              legend: { display: true, position: 'top', labels: { color: textColor, font: { size: 10 }, boxWidth: 12 } },
+              tooltip: { callbacks: { label: tooltipCallback } }
             }, 
             scales: { 
-              x: { 
-                ticks: { 
-                  color: textColor, 
-                  maxRotation: 0, 
-                  minRotation: 0,
-                  callback: (val) => formatMillionsAxis(val)
-                }, 
-                grid: { color: gridColor } 
-              }, 
+              x: { grace: '15%', ticks: { color: textColor, callback: (val) => formatMillionsAxis(val) }, grid: { color: gridColor } }, 
               y: { ticks: { color: textColor }, grid: { display: false } } 
             },
             onClick: (e, elements) => {
@@ -1116,14 +1181,9 @@
             plugins: { 
               legend: { 
                 position: 'bottom', 
-                labels: { color: textColor, font: { size: 11 } },
-                onClick: (e, legendItem, legend) => {
-                  Chart.defaults.plugins.legend.onClick.call(this, e, legendItem, legend);
-                  legend.chart.update();
-                }
+                labels: { color: textColor, font: { size: 11 } }
               },
-              tooltip: pieTooltipDesign(typeMap),
-              datalabels: { display: false }
+              tooltip: pieTooltipDesign(typeMap)
             },
             onClick: (e, elements) => {
               if (elements.length > 0) {
@@ -1137,9 +1197,7 @@
         const rpMap = {};
         filteredData.forEach(d => { 
           const rpKey = d.rp || 'RP Não Ind.';
-          if (!rpMap[rpKey]) {
-            rpMap[rpKey] = { global: 0, empenho: 0, repassado: 0, faltaRepassar: 0 };
-          }
+          if (!rpMap[rpKey]) rpMap[rpKey] = { global: 0, empenho: 0, repassado: 0, faltaRepassar: 0 };
           rpMap[rpKey].global += d.global;
           rpMap[rpKey].empenho += d.empenho;
           rpMap[rpKey].repassado += d.repassado;
@@ -1163,16 +1221,8 @@
             maintainAspectRatio: false, 
             cutout: '72%',
             plugins: { 
-              legend: { 
-                position: 'bottom', 
-                labels: { color: textColor, font: { size: 11 } },
-                onClick: (e, legendItem, legend) => {
-                  Chart.defaults.plugins.legend.onClick.call(this, e, legendItem, legend);
-                  legend.chart.update();
-                }
-              },
-              tooltip: pieTooltipDesign(rpMap),
-              datalabels: { display: false }
+              legend: { position: 'bottom', labels: { color: textColor, font: { size: 11 } } },
+              tooltip: pieTooltipDesign(rpMap)
             },
             onClick: (e, elements) => {
               if (elements.length > 0) {
@@ -1184,10 +1234,11 @@
         };
 
         return {
-          uf: { title: "Volume e Execução por Estado (Top 10 Estados)", config: configUf },
-          program: { title: "Top 5 Programas de Governo", config: configProgram },
-          type: { title: "Distribuição por Tipo de Instrumento", config: configType },
-          rp: { title: "Distribuição por Modalidade (RP)", config: configRp }
+          uf: { title: "Volume por Estado (Top 10)", config: configUf },
+          parlamentar: { title: "Top 5 Parlamentares", config: configParlamentar },
+          program: { title: "Top 5 Programas", config: configProgram },
+          type: { title: "Por Tipo de Instrumento", config: configType },
+          rp: { title: "Por Modalidade (RP)", config: configRp }
         };
       }, [filteredData, isLightMode, isAuthenticated]);
 
@@ -1197,6 +1248,11 @@
         if (chartUfRef.current) {
           if (instanceUf.current) instanceUf.current.destroy();
           instanceUf.current = new Chart(chartUfRef.current, chartConfigs.uf.config);
+        }
+
+        if (chartParlamentarRef.current) {
+          if (instanceParlamentar.current) instanceParlamentar.current.destroy();
+          instanceParlamentar.current = new Chart(chartParlamentarRef.current, chartConfigs.parlamentar.config);
         }
 
         if (chartTypeRef.current) {
@@ -1287,9 +1343,9 @@
 
               <button
                 onClick={() => window.print()}
-                className={`px-4 py-2 rounded-xl text-xs font-bold transition-all border flex items-center gap-2 ${isLightMode ? 'bg-white border-slate-300 text-slate-700 hover:bg-slate-50' : 'bg-slate-800 border-slate-700 text-slate-200 hover:bg-slate-700'}`}
+                className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-bold transition-all shadow-md flex items-center gap-2"
               >
-                🖨 Imprimir Página Inteira
+                📄 Relatório Executivo PDF
               </button>
 
               <button
@@ -1335,7 +1391,7 @@
             </div>
           ) : (
             <>
-              {/* FILTROS */}
+              {/* FILTROS PRINCIPAIS */}
               {!presentationMode && (
                 <div className={`border rounded-2xl p-5 space-y-4 shadow-xl no-print ${isLightMode ? 'bg-white border-slate-200' : 'bg-slate-900 border-slate-800'}`}>
                   <div className="flex flex-wrap items-center justify-between gap-4 border-b pb-4 border-slate-700/50">
@@ -1369,9 +1425,17 @@
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-8 gap-3">
                     <MultiSelectDropdown
-                      title="Filtrar por Programa(s)"
+                      title="Parlamentar(es)"
+                      options={parlamentaresDisponiveis}
+                      selectedValues={selectedParlamentares}
+                      onChange={(vals) => { setSelectedParlamentares(vals); setCurrentPage(1); }}
+                      isLightMode={isLightMode}
+                    />
+
+                    <MultiSelectDropdown
+                      title="Programa(s)"
                       options={programasDisponiveis}
                       selectedValues={selectedProgramas}
                       onChange={(vals) => { setSelectedProgramas(vals); setCurrentPage(1); }}
@@ -1379,7 +1443,7 @@
                     />
 
                     <MultiSelectDropdown
-                      title="Filtrar por Estado(s) UF"
+                      title="Estado(s) UF"
                       options={ufsDisponiveis}
                       selectedValues={selectedUFs}
                       onChange={(vals) => { setSelectedUFs(vals); setCurrentPage(1); }}
@@ -1388,36 +1452,46 @@
 
                     <div>
                       <label className={`text-xs mb-1 block font-medium ${isLightMode ? 'text-slate-600' : 'text-slate-400'}`}>Modalidade (RP)</label>
-                      <select value={filterRP} onChange={(e) => { setFilterRP(e.target.value); setCurrentPage(1); }} className={`w-full border rounded-xl px-3 py-2 text-xs ${isLightMode ? 'bg-white border-slate-300 text-slate-800' : 'bg-slate-950 border-slate-800 text-white'}`}>
+                      <select value={filterRP} onChange={(e) => { setFilterRP(e.target.value); setCurrentPage(1); }} className={`w-full border rounded-xl px-2.5 py-2 text-xs ${isLightMode ? 'bg-white border-slate-300 text-slate-800' : 'bg-slate-950 border-slate-800 text-white'}`}>
                         <option value="ALL">Todas as RPs</option>
                         {rpsDisponiveis.map(rp => <option key={rp} value={rp}>{rp}</option>)}
                       </select>
                     </div>
 
                     <div>
-                      <label className={`text-xs mb-1 block font-medium ${isLightMode ? 'text-slate-600' : 'text-slate-400'}`}>Ano de Celebração</label>
-                      <select value={filterAno} onChange={(e) => { setFilterAno(e.target.value); setCurrentPage(1); }} className={`w-full border rounded-xl px-3 py-2 text-xs ${isLightMode ? 'bg-white border-slate-300 text-slate-800' : 'bg-slate-950 border-slate-800 text-white'}`}>
+                      <label className="text-xs font-bold text-sky-500 mb-1 block">Faixa de Valor</label>
+                      <select value={filterFaixaValor} onChange={(e) => { setFilterFaixaValor(e.target.value); setCurrentPage(1); }} className={`w-full border rounded-xl px-2.5 py-2 text-xs ${isLightMode ? 'bg-white border-sky-300 text-slate-800' : 'bg-slate-950 border-sky-800/80 text-white'}`}>
+                        <option value="ALL">Todas as Faixas</option>
+                        <option value="500K">Até R$ 500 mil</option>
+                        <option value="500K_2M">R$ 500k a R$ 2 mi</option>
+                        <option value="2M">Acima de R$ 2 mi</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className={`text-xs mb-1 block font-medium ${isLightMode ? 'text-slate-600' : 'text-slate-400'}`}>Ano Celebração</label>
+                      <select value={filterAno} onChange={(e) => { setFilterAno(e.target.value); setCurrentPage(1); }} className={`w-full border rounded-xl px-2.5 py-2 text-xs ${isLightMode ? 'bg-white border-slate-300 text-slate-800' : 'bg-slate-950 border-slate-800 text-white'}`}>
                         <option value="ALL">Todos os Anos</option>
                         {anosDisponiveis.map(ano => <option key={ano} value={ano}>{ano}</option>)}
                       </select>
                     </div>
 
                     <div>
-                      <label className="text-xs font-bold text-blue-500 mb-1 block">Ano do Repasse (Teto Base)</label>
-                      <select value={filterAnoRepasse} onChange={(e) => { setFilterAnoRepasse(e.target.value); setCurrentPage(1); }} className={`w-full border rounded-xl px-3 py-2 text-xs ${isLightMode ? 'bg-white border-blue-400 text-slate-800' : 'bg-slate-950 border-blue-800/80 text-white'}`}>
-                        <option value="ALL">Todos os Anos de Repasse</option>
+                      <label className="text-xs font-bold text-emerald-500 mb-1 block">Ano Repasse</label>
+                      <select value={filterAnoRepasse} onChange={(e) => { setFilterAnoRepasse(e.target.value); setCurrentPage(1); }} className={`w-full border rounded-xl px-2.5 py-2 text-xs ${isLightMode ? 'bg-white border-emerald-300 text-slate-800' : 'bg-slate-950 border-emerald-800/80 text-white'}`}>
+                        <option value="ALL">Todos Anos Pagos</option>
                         {anosRepasseDisponiveis.map(ano => <option key={ano} value={ano}>{ano}</option>)}
                       </select>
                     </div>
 
                     <div>
-                      <label className="text-xs font-bold text-amber-500 mb-1 block">Filtro de Vigência</label>
-                      <select value={filterVigenciaAlerta} onChange={(e) => { setFilterVigenciaAlerta(e.target.value); setCurrentPage(1); }} className={`w-full border rounded-xl px-3 py-2 text-xs ${isLightMode ? 'bg-amber-50 border-amber-300 text-slate-800' : 'bg-slate-950 border-amber-800/80 text-white'}`}>
-                        <option value="ALL">Todas as Vigências</option>
-                        <option value="ALERTA">🚨 Vencem no Ano Atual ({currentYear})</option>
-                        <option value="30">⚠️ Vencem em até 30 dias (0 a 30)</option>
-                        <option value="60">⚠️ Vencem em até 60 dias (31 a 60)</option>
-                        <option value="90">⚠️ Vencem em até 90 dias (61 a 90)</option>
+                      <label className="text-xs font-bold text-amber-500 mb-1 block">Vigência</label>
+                      <select value={filterVigenciaAlerta} onChange={(e) => { setFilterVigenciaAlerta(e.target.value); setCurrentPage(1); }} className={`w-full border rounded-xl px-2.5 py-2 text-xs ${isLightMode ? 'bg-amber-50 border-amber-300 text-slate-800' : 'bg-slate-950 border-amber-800/80 text-white'}`}>
+                        <option value="ALL">Todas</option>
+                        <option value="ALERTA">🚨 Ano {currentYear}</option>
+                        <option value="30">⚠️ Até 30 dias</option>
+                        <option value="60">⚠️ Até 60 dias</option>
+                        <option value="90">⚠️ Até 90 dias</option>
                       </select>
                     </div>
                   </div>
@@ -1452,96 +1526,95 @@
               </div>
 
               {/* CARDS INDICADORES E KPIS */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4 print-card">
-                <div className={`border rounded-2xl p-4 shadow-lg hover:shadow-xl transition-all ${isLightMode ? 'bg-white border-slate-200' : 'bg-slate-900 border-slate-800'}`}>
-                  <div className={`text-xs font-semibold uppercase tracking-wider ${isLightMode ? 'text-slate-500' : 'text-slate-400'}`}>Volume Global</div>
-                  <div className="text-lg font-extrabold mt-1">{fmtR$(totGlobal)}</div>
-                  <div className="text-slate-400 text-[11px] mt-2">{filteredData.length} registros</div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3 print-card">
+                <div className={`border rounded-2xl p-3.5 shadow-lg ${isLightMode ? 'bg-white border-slate-200' : 'bg-slate-900 border-slate-800'}`}>
+                  <div className={`text-[11px] font-semibold uppercase tracking-wider ${isLightMode ? 'text-slate-500' : 'text-slate-400'}`}>Volume Global</div>
+                  <div className="text-base font-extrabold mt-1">{fmtR$(totGlobal)}</div>
+                  <div className="text-slate-400 text-[10px] mt-1">{filteredData.length} registros</div>
                 </div>
 
-                <div className={`border rounded-2xl p-4 shadow-lg hover:shadow-xl transition-all ${isLightMode ? 'bg-white border-slate-200' : 'bg-slate-900 border-slate-800'}`}>
-                  <div className={`text-xs font-semibold uppercase tracking-wider ${isLightMode ? 'text-slate-500' : 'text-slate-400'}`}>Total Empenhado</div>
-                  <div className="text-lg font-extrabold text-amber-500 mt-1">{fmtR$(totEmpenho)}</div>
-                  <div className="text-slate-400 text-[11px] mt-2">Empenhos válidos</div>
+                <div className={`border rounded-2xl p-3.5 shadow-lg ${isLightMode ? 'bg-white border-slate-200' : 'bg-slate-900 border-slate-800'}`}>
+                  <div className={`text-[11px] font-semibold uppercase tracking-wider ${isLightMode ? 'text-slate-500' : 'text-slate-400'}`}>Total Empenhado</div>
+                  <div className="text-base font-extrabold text-amber-500 mt-1">{fmtR$(totEmpenho)}</div>
+                  <div className="text-slate-400 text-[10px] mt-1">Empenhos válidos</div>
                 </div>
 
-                <div className={`border rounded-2xl p-4 shadow-lg hover:shadow-xl transition-all ${isLightMode ? 'bg-white border-slate-200' : 'bg-slate-900 border-slate-800'}`}>
-                  <div className={`text-xs font-semibold uppercase tracking-wider ${isLightMode ? 'text-slate-500' : 'text-slate-400'}`}>Total Repassado</div>
-                  <div className="text-lg font-extrabold text-emerald-500 mt-1">{fmtR$(totRepassado)}</div>
-                  <div className="text-slate-400 text-[11px] mt-2">Recursos pagos</div>
+                <div className={`border rounded-2xl p-3.5 shadow-lg ${isLightMode ? 'bg-white border-slate-200' : 'bg-slate-900 border-slate-800'}`}>
+                  <div className={`text-[11px] font-semibold uppercase tracking-wider ${isLightMode ? 'text-slate-500' : 'text-slate-400'}`}>Total Repassado</div>
+                  <div className="text-base font-extrabold text-emerald-500 mt-1">{fmtR$(totRepassado)}</div>
+                  <div className="text-slate-400 text-[10px] mt-1">Recursos pagos</div>
                 </div>
 
-                <div className={`border rounded-2xl p-4 shadow-lg hover:shadow-xl transition-all ${isLightMode ? 'bg-white border-slate-200' : 'bg-slate-900 border-slate-800'}`}>
-                  <div className={`text-xs font-semibold uppercase tracking-wider ${isLightMode ? 'text-slate-500' : 'text-slate-400'}`}>% Execução</div>
-                  <div className="text-lg font-extrabold text-indigo-500 mt-1">{pctExecucaoEmpenho}%</div>
-                  <div className="w-full bg-slate-200 h-1.5 rounded-full mt-2 overflow-hidden">
+                <div className={`border rounded-2xl p-3.5 shadow-lg ${isLightMode ? 'bg-white border-slate-200' : 'bg-slate-900 border-slate-800'}`}>
+                  <div className={`text-[11px] font-semibold uppercase tracking-wider ${isLightMode ? 'text-slate-500' : 'text-slate-400'}`}>% Execução</div>
+                  <div className="text-base font-extrabold text-indigo-500 mt-1">{pctExecucaoEmpenho}%</div>
+                  <div className="w-full bg-slate-200 h-1.5 rounded-full mt-1.5 overflow-hidden">
                     <div className="bg-indigo-500 h-full" style={{ width: `${Math.min(pctExecucaoEmpenho, 100)}%` }}></div>
                   </div>
                 </div>
 
                 <div 
                   onClick={() => { setFilterFaltaRepassar(!filterFaltaRepassar); setCurrentPage(1); }}
-                  className={`border rounded-2xl p-4 shadow-lg hover:shadow-xl transition-all cursor-pointer hover:scale-[1.02] ${filterFaltaRepassar ? 'ring-2 ring-rose-500' : ''} ${isLightMode ? 'bg-rose-50/50 border-rose-200 hover:bg-rose-100/60' : 'bg-rose-950/20 border-rose-900/40 hover:bg-rose-950/40'}`}
+                  className={`border rounded-2xl p-3.5 shadow-lg hover:shadow-xl transition-all cursor-pointer hover:scale-[1.02] ${filterFaltaRepassar ? 'ring-2 ring-rose-500' : ''} ${isLightMode ? 'bg-rose-50/50 border-rose-200 hover:bg-rose-100/60' : 'bg-rose-950/20 border-rose-900/40 hover:bg-rose-950/40'}`}
                 >
-                  <div className="text-rose-500 text-xs font-semibold uppercase tracking-wider flex items-center justify-between">
+                  <div className="text-rose-500 text-[11px] font-semibold uppercase tracking-wider flex items-center justify-between">
                     <span>Falta Repassar</span>
-                    {filterFaltaRepassar && <span className="text-[10px] bg-rose-600 text-white px-1.5 py-0.5 rounded-md font-black shadow-sm">Ativo</span>}
+                    {filterFaltaRepassar && <span className="text-[9px] bg-rose-600 text-white px-1.5 py-0.5 rounded font-black">Ativo</span>}
                   </div>
-                  <div className="text-lg font-extrabold text-rose-500 mt-1">{fmtR$(totFaltaRepassar)}</div>
-                  <div className="text-slate-400 text-[11px] mt-2 flex justify-between items-center">
-                    <span>Empenhado - Repassado</span>
-                    <span className="text-rose-400 font-bold text-[10px]">Filtrar 🔍</span>
+                  <div className="text-base font-extrabold text-rose-500 mt-1">{fmtR$(totFaltaRepassar)}</div>
+                  <div className="text-slate-400 text-[10px] mt-1 flex justify-between items-center">
+                    <span>Empenhado - Pago</span>
+                    <span className="text-rose-400 font-bold text-[9px]">Filtrar 🔍</span>
                   </div>
                 </div>
 
                 <div 
                   onClick={() => { setFilterVigenciaAlerta(filterVigenciaAlerta === 'ALERTA' ? 'ALL' : 'ALERTA'); setCurrentPage(1); }}
-                  className={`border rounded-2xl p-4 shadow-lg flex flex-col justify-between cursor-pointer transition-all hover:scale-[1.02] ${filterVigenciaAlerta === 'ALERTA' ? 'ring-2 ring-amber-500' : ''} ${isLightMode ? 'bg-amber-50/60 border-amber-200 hover:bg-amber-100/80' : 'bg-amber-950/20 border-amber-900/50 hover:bg-amber-950/40'}`}
+                  className={`border rounded-2xl p-3.5 shadow-lg flex flex-col justify-between cursor-pointer transition-all hover:scale-[1.02] ${filterVigenciaAlerta === 'ALERTA' ? 'ring-2 ring-amber-500' : ''} ${isLightMode ? 'bg-amber-50/60 border-amber-200 hover:bg-amber-100/80' : 'bg-amber-950/20 border-amber-900/50 hover:bg-amber-950/40'}`}
                 >
                   <div>
-                    <div className="text-amber-500 text-xs font-bold uppercase tracking-wider flex items-center justify-between">
+                    <div className="text-amber-500 text-[11px] font-bold uppercase tracking-wider flex items-center justify-between">
                       <span>Vigências {currentYear}</span>
-                      {filterVigenciaAlerta === 'ALERTA' && <span className="text-[10px] bg-amber-500 text-black px-1.5 py-0.5 rounded-md font-black shadow-sm">Ativo</span>}
+                      {filterVigenciaAlerta === 'ALERTA' && <span className="text-[9px] bg-amber-500 text-black px-1.5 py-0.5 rounded font-black">Ativo</span>}
                     </div>
-                    <div className="flex items-baseline gap-1.5 mt-1">
-                      <span className="text-xl font-extrabold text-amber-500">{totalAlertasVigencia}</span>
-                      <span className="text-xs text-slate-400 font-medium">processos no ano</span>
+                    <div className="flex items-baseline gap-1.5 mt-0.5">
+                      <span className="text-base font-extrabold text-amber-500">{totalAlertasVigencia}</span>
+                      <span className="text-[10px] text-slate-400 font-medium">no ano</span>
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-3 gap-1.5 mt-3 pt-2.5 border-t border-amber-500/20" onClick={(e) => e.stopPropagation()}>
+                  <div className="grid grid-cols-3 gap-1 mt-2 pt-1.5 border-t border-amber-500/20" onClick={(e) => e.stopPropagation()}>
                     <button
-                      title="Vencem especificamente de 0 a 30 dias"
                       onClick={() => { setFilterVigenciaAlerta(filterVigenciaAlerta === '30' ? 'ALL' : '30'); setCurrentPage(1); }}
-                      className={`border rounded-xl p-1 text-center transition-all shadow-sm ${filterVigenciaAlerta === '30' ? 'bg-rose-600 text-white border-rose-500 shadow-rose-500/30' : (isLightMode ? 'bg-rose-100/80 border-rose-300 hover:bg-rose-200' : 'bg-rose-950/40 border-rose-500/30 hover:bg-rose-900/50')}`}
+                      className={`border rounded-lg p-0.5 text-center transition-all ${filterVigenciaAlerta === '30' ? 'bg-rose-600 text-white border-rose-500' : 'bg-rose-950/20 border-rose-500/30'}`}
                     >
-                      <span className={`block text-[9px] font-extrabold ${filterVigenciaAlerta === '30' ? 'text-white' : 'text-rose-400'}`}>30d</span>
-                      <span className={`text-xs font-extrabold ${filterVigenciaAlerta === '30' ? 'text-white' : (isLightMode ? 'text-rose-800' : 'text-rose-200')}`}>{vencendo30}</span>
+                      <span className="block text-[8px] font-extrabold text-rose-400">30d</span>
+                      <span className="text-[10px] font-extrabold text-rose-300">{vencendo30}</span>
                     </button>
 
                     <button
-                      title="Vencem especificamente de 31 a 60 dias"
                       onClick={() => { setFilterVigenciaAlerta(filterVigenciaAlerta === '60' ? 'ALL' : '60'); setCurrentPage(1); }}
-                      className={`border rounded-xl p-1 text-center transition-all shadow-sm ${filterVigenciaAlerta === '60' ? 'bg-amber-600 text-white border-amber-500 shadow-amber-500/30' : (isLightMode ? 'bg-amber-100/80 border-amber-300 hover:bg-amber-200' : 'bg-amber-950/40 border-amber-500/30 hover:bg-amber-900/50')}`}
+                      className={`border rounded-lg p-0.5 text-center transition-all ${filterVigenciaAlerta === '60' ? 'bg-amber-600 text-white border-amber-500' : 'bg-amber-950/20 border-amber-500/30'}`}
                     >
-                      <span className={`block text-[9px] font-extrabold ${filterVigenciaAlerta === '60' ? 'text-white' : 'text-amber-400'}`}>60d</span>
-                      <span className={`text-xs font-extrabold ${filterVigenciaAlerta === '60' ? 'text-white' : (isLightMode ? 'text-amber-800' : 'text-amber-200')}`}>{vencendo60}</span>
+                      <span className="block text-[8px] font-extrabold text-amber-400">60d</span>
+                      <span className="text-[10px] font-extrabold text-amber-300">{vencendo60}</span>
                     </button>
 
                     <button
-                      title="Vencem especificamente de 61 a 90 dias"
                       onClick={() => { setFilterVigenciaAlerta(filterVigenciaAlerta === '90' ? 'ALL' : '90'); setCurrentPage(1); }}
-                      className={`border rounded-xl p-1 text-center transition-all shadow-sm ${filterVigenciaAlerta === '90' ? 'bg-sky-600 text-white border-sky-500 shadow-sky-500/30' : (isLightMode ? 'bg-sky-100/80 border-sky-300 hover:bg-sky-200' : 'bg-sky-950/40 border-sky-500/30 hover:bg-sky-900/50')}`}
+                      className={`border rounded-lg p-0.5 text-center transition-all ${filterVigenciaAlerta === '90' ? 'bg-sky-600 text-white border-sky-500' : 'bg-sky-950/20 border-sky-500/30'}`}
                     >
-                      <span className={`block text-[9px] font-extrabold ${filterVigenciaAlerta === '90' ? 'text-white' : 'text-sky-400'}`}>90d</span>
-                      <span className={`text-xs font-extrabold ${filterVigenciaAlerta === '90' ? 'text-white' : (isLightMode ? 'text-sky-800' : 'text-sky-200')}`}>{vencendo90}</span>
+                      <span className="block text-[8px] font-extrabold text-sky-400">90d</span>
+                      <span className="text-[10px] font-extrabold text-sky-300">{vencendo90}</span>
                     </button>
                   </div>
                 </div>
               </div>
 
-              {/* SEÇÃO DE MAPA E GRÁFICOS */}
+              {/* SEÇÃO DE MAPA E GRÁFICOS ORGANIZADOS */}
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                
+                {/* MAPA BRASIL */}
                 <div className={`border rounded-2xl p-5 shadow-lg flex flex-col justify-between print-card ${isLightMode ? 'bg-white border-slate-200' : 'bg-slate-900 border-slate-800'}`}>
                   <div className="flex items-center justify-between mb-2">
                     <h3 className={`text-xs font-bold uppercase tracking-wider ${isLightMode ? 'text-slate-700' : 'text-slate-300'}`}>Mapa de Distribuição (UF)</h3>
@@ -1561,8 +1634,11 @@
                   <p className="text-[11px] text-slate-400 text-center mt-3 no-print">Clique em qualquer estado para filtrar a lista.</p>
                 </div>
 
+                {/* PAINEL DE GRÁFICOS LADO A LADO */}
                 <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className={`border rounded-2xl p-4 shadow-lg flex flex-col justify-between print-card ${isLightMode ? 'bg-white border-slate-200' : 'bg-slate-900 border-slate-800'}`}>
+                  
+                  {/* LINHA 1: VOLUME POR ESTADO SOZINHO NA PRIMEIRA LINHA */}
+                  <div className={`border rounded-2xl p-4 shadow-lg flex flex-col justify-between print-card sm:col-span-2 ${isLightMode ? 'bg-white border-slate-200' : 'bg-slate-900 border-slate-800'}`}>
                     <div className="flex items-center justify-between mb-2">
                       <h3 className={`text-xs font-bold uppercase tracking-wider ${isLightMode ? 'text-slate-700' : 'text-slate-300'}`}>Volume por Estado (Top 10)</h3>
                       {chartConfigs.uf && (
@@ -1574,9 +1650,10 @@
                         </button>
                       )}
                     </div>
-                    <div className="h-48 relative"><canvas ref={chartUfRef}></canvas></div>
+                    <div className="h-52 relative"><canvas ref={chartUfRef}></canvas></div>
                   </div>
 
+                  {/* LINHA 2: TOP 5 PROGRAMAS E TOP 5 PARLAMENTARES LADO A LADO */}
                   <div className={`border rounded-2xl p-4 shadow-lg flex flex-col justify-between print-card ${isLightMode ? 'bg-white border-slate-200' : 'bg-slate-900 border-slate-800'}`}>
                     <div className="flex items-center justify-between mb-2">
                       <h3 className={`text-xs font-bold uppercase tracking-wider ${isLightMode ? 'text-slate-700' : 'text-slate-300'}`}>Top 5 Programas</h3>
@@ -1592,6 +1669,22 @@
                     <div className="h-48 relative"><canvas ref={chartProgramRef}></canvas></div>
                   </div>
 
+                  <div className={`border rounded-2xl p-4 shadow-lg flex flex-col justify-between print-card ${isLightMode ? 'bg-white border-slate-200' : 'bg-slate-900 border-slate-800'}`}>
+                    <div className="flex items-center justify-between mb-2">
+                      <h3 className={`text-xs font-bold uppercase tracking-wider ${isLightMode ? 'text-slate-700' : 'text-slate-300'}`}>Top 5 Parlamentares</h3>
+                      {chartConfigs.parlamentar && (
+                        <button
+                          onClick={() => setExpandedItem({ isMap: false, title: chartConfigs.parlamentar.title, chartConfig: chartConfigs.parlamentar.config })}
+                          className={`text-[10px] px-2 py-1 rounded-lg transition-all font-semibold no-print ${isLightMode ? 'bg-slate-100 text-blue-600 hover:bg-slate-200' : 'bg-slate-800 text-blue-400 hover:bg-slate-700'}`}
+                        >
+                          🔍 Expandir / Imprimir
+                        </button>
+                      )}
+                    </div>
+                    <div className="h-48 relative"><canvas ref={chartParlamentarRef}></canvas></div>
+                  </div>
+
+                  {/* LINHA 3: OS DOIS GRÁFICOS DE PIZZA/ROSCA LADO A LADO NA PARTE INFERIOR */}
                   <div className={`border rounded-2xl p-4 shadow-lg flex flex-col justify-between print-card ${isLightMode ? 'bg-white border-slate-200' : 'bg-slate-900 border-slate-800'}`}>
                     <div className="flex items-center justify-between mb-2">
                       <h3 className={`text-xs font-bold uppercase tracking-wider ${isLightMode ? 'text-slate-700' : 'text-slate-300'}`}>Por Tipo de Instrumento</h3>
@@ -1625,6 +1718,7 @@
                       <canvas ref={chartRpRef}></canvas>
                     </div>
                   </div>
+
                 </div>
               </div>
 
@@ -1635,24 +1729,33 @@
                     <span>Detalhamento dos Instrumentos ({sortedData.length})</span>
                     {filterFaltaRepassar && (
                       <span className="bg-rose-500/20 text-rose-500 border border-rose-500/30 text-[10px] px-2 py-0.5 rounded-full font-bold">
-                        Filtrando Pendentes de Repasse
+                        Pendentes de Repasse
                       </span>
                     )}
                   </h3>
 
-                  <div className="flex items-center gap-2 text-xs text-slate-400 no-print">
-                    <span>Exibir:</span>
-                    <select
-                      value={itemsPerPage}
-                      onChange={(e) => { setItemsPerPage(Number(e.target.value)); setCurrentPage(1); }}
-                      className={`border rounded-lg px-2 py-1 ${isLightMode ? 'bg-white border-slate-300 text-slate-800' : 'bg-slate-950 border-slate-800 text-white'}`}
+                  <div className="flex items-center gap-3 text-xs text-slate-400 no-print">
+                    <button
+                      onClick={handleExportExcel}
+                      className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-3 py-1.5 rounded-xl transition-all shadow-md flex items-center gap-1.5"
                     >
-                      <option value={10}>10</option>
-                      <option value={25}>25</option>
-                      <option value={50}>50</option>
-                      <option value={100}>100</option>
-                    </select>
-                    <span>por página</span>
+                      📥 Exportar Excel
+                    </button>
+
+                    <div className="flex items-center gap-1.5">
+                      <span>Exibir:</span>
+                      <select
+                        value={itemsPerPage}
+                        onChange={(e) => { setItemsPerPage(Number(e.target.value)); setCurrentPage(1); }}
+                        className={`border rounded-lg px-2 py-1 ${isLightMode ? 'bg-white border-slate-300 text-slate-800' : 'bg-slate-950 border-slate-800 text-white'}`}
+                      >
+                        <option value={10}>10</option>
+                        <option value={25}>25</option>
+                        <option value={50}>50</option>
+                        <option value={100}>100</option>
+                      </select>
+                      <span>/ pág.</span>
+                    </div>
                   </div>
                 </div>
 
@@ -1660,76 +1763,81 @@
                   <table className="w-full text-left text-xs">
                     <thead className={`uppercase tracking-wider border-b select-none ${isLightMode ? 'bg-slate-100 text-slate-600 border-slate-200' : 'bg-slate-950 text-slate-400 border-slate-800'}`}>
                       <tr>
-                        <th onClick={() => handleSort('ano')} className="p-3 text-center cursor-pointer hover:text-blue-500">
-                          Ano {sortConfig.key === 'ano' ? (sortConfig.direction === 'asc' ? '▲' : '▼') : ''}
+                        <th onClick={() => handleSort('ano')} className="p-3 text-center cursor-pointer hover:text-blue-500 whitespace-nowrap">
+                          Ano {renderSortIndicator('ano')}
                         </th>
-                        <th onClick={() => handleSort('proponente')} className="p-3 cursor-pointer hover:text-blue-500">
-                          Proponente / Instrumento {sortConfig.key === 'proponente' ? (sortConfig.direction === 'asc' ? '▲' : '▼') : ''}
+                        <th onClick={() => handleSort('proponente')} className="p-3 cursor-pointer hover:text-blue-500 whitespace-nowrap">
+                          Proponente / Instrumento {renderSortIndicator('proponente')}
                         </th>
-                        <th onClick={() => handleSort('numSEI')} className="p-3 text-center cursor-pointer hover:text-blue-500">
-                          Nº SEI {sortConfig.key === 'numSEI' ? (sortConfig.direction === 'asc' ? '▲' : '▼') : ''}
+                        <th onClick={() => handleSort('numSEI')} className="p-3 text-center cursor-pointer hover:text-blue-500 whitespace-nowrap">
+                          Nº SEI {renderSortIndicator('numSEI')}
                         </th>
-                        <th onClick={() => handleSort('parlamentar')} className="p-3 text-center cursor-pointer hover:text-blue-500">
-                          Parlamentar {sortConfig.key === 'parlamentar' ? (sortConfig.direction === 'asc' ? '▲' : '▼') : ''}
+                        <th onClick={() => handleSort('parlamentar')} className="p-3 text-center cursor-pointer hover:text-blue-500 whitespace-nowrap">
+                          Parlamentar {renderSortIndicator('parlamentar')}
                         </th>
-                        <th onClick={() => handleSort('uf')} className="p-3 text-center cursor-pointer hover:text-blue-500">
-                          UF {sortConfig.key === 'uf' ? (sortConfig.direction === 'asc' ? '▲' : '▼') : ''}
+                        <th onClick={() => handleSort('uf')} className="p-3 text-center cursor-pointer hover:text-blue-500 whitespace-nowrap">
+                          UF {renderSortIndicator('uf')}
                         </th>
-                        <th onClick={() => handleSort('inicioVigencia')} className="p-3 text-center cursor-pointer hover:text-blue-500 print-hide-col">
-                          Início Vig.
+                        <th onClick={() => handleSort('inicioVigencia')} className="p-3 text-center cursor-pointer hover:text-blue-500 print-hide-col whitespace-nowrap">
+                          Início Vig. {renderSortIndicator('inicioVigencia')}
                         </th>
-                        <th onClick={() => handleSort('fimVigencia')} className="p-3 text-center cursor-pointer hover:text-blue-500">
-                          Fim Vig. {sortConfig.key === 'fimVigencia' ? (sortConfig.direction === 'asc' ? '▲' : '▼') : ''}
+                        <th onClick={() => handleSort('fimVigencia')} className="p-3 text-center cursor-pointer hover:text-blue-500 whitespace-nowrap">
+                          Fim Vig. / Risco {renderSortIndicator('fimVigencia')}
                         </th>
-                        <th onClick={() => handleSort('global')} className="p-3 text-right cursor-pointer hover:text-blue-500">
-                          Valor Global {sortConfig.key === 'global' ? (sortConfig.direction === 'asc' ? '▲' : '▼') : ''}
+                        <th onClick={() => handleSort('global')} className="p-3 text-right cursor-pointer hover:text-blue-500 whitespace-nowrap">
+                          Valor Global {renderSortIndicator('global')}
                         </th>
-                        <th onClick={() => handleSort('empenho')} className="p-3 text-right cursor-pointer hover:text-blue-500">
-                          Empenhado {sortConfig.key === 'empenho' ? (sortConfig.direction === 'asc' ? '▲' : '▼') : ''}
+                        <th onClick={() => handleSort('empenho')} className="p-3 text-right cursor-pointer hover:text-blue-500 whitespace-nowrap">
+                          Empenhado {renderSortIndicator('empenho')}
                         </th>
-                        <th onClick={() => handleSort('repassado')} className="p-3 text-right cursor-pointer hover:text-blue-500">
-                          Repassado {sortConfig.key === 'repassado' ? (sortConfig.direction === 'asc' ? '▲' : '▼') : ''}
+                        <th onClick={() => handleSort('repassado')} className="p-3 text-right cursor-pointer hover:text-blue-500 whitespace-nowrap">
+                          Repassado {renderSortIndicator('repassado')}
                         </th>
-                        <th className="p-3">Observação / Situação</th>
+                        <th className="p-3 whitespace-nowrap">Observação / Situação</th>
                       </tr>
                     </thead>
                     <tbody className={`divide-y ${isLightMode ? 'divide-slate-200' : 'divide-slate-800/50'}`}>
-                      {paginatedData.map(item => (
-                        <tr key={item.id} className={`transition-colors ${item.alertaVigencia ? (isLightMode ? 'bg-rose-50' : 'bg-rose-950/20') : (isLightMode ? 'hover:bg-slate-50' : 'hover:bg-slate-800/40')}`}>
-                          <td className="p-3 text-center font-bold text-slate-400">{item.ano}</td>
-                          <td className="p-3 font-semibold">
-                            {item.proponente}
-                            <div className="text-[10px] text-blue-500 font-bold uppercase mt-0.5">
-                              {item.codInst}
-                              {item.rp && <span className="text-emerald-500 ml-1">• {item.rp}</span>}
-                              {item.codPrograma && <span className="text-purple-500 ml-1">• {item.codPrograma}</span>}
-                            </div>
-                          </td>
-                          <td className="p-3 text-center font-mono text-cyan-500 font-medium whitespace-nowrap">{item.numSEI}</td>
-                          <td className="p-3 text-center font-medium text-amber-400 whitespace-nowrap">{item.parlamentar}</td>
-                          <td className="p-3 text-center font-bold">{item.uf}</td>
-                          <td className="p-3 text-center whitespace-nowrap print-hide-col">{item.inicioVigencia}</td>
-                          <td className="p-3 text-center whitespace-nowrap">
-                            <span className={item.alertaVigencia ? 'text-rose-500 font-bold flex items-center justify-center gap-1' : ''}>
-                              {item.alertaVigencia && '🚨 '}
-                              {item.fimVigencia}
-                            </span>
-                            {item.diasParaVencer !== null && (
-                              <div className={`text-[9px] ${item.alertaVigencia ? 'text-rose-500 font-bold' : 'text-slate-400'}`}>
-                                {item.diasParaVencer < 0 ? 'Vencido' : `${item.diasParaVencer} dias restantes`}
+                      {paginatedData.map(item => {
+                        const risk = getRiskStatus(item);
+                        return (
+                          <tr key={item.id} className={`transition-all border-l-4 ${risk.bg}`}>
+                            <td className="p-3 text-center font-bold text-slate-400">
+                              {item.ano}
+                              {item.anoRepasse && item.anoRepasse !== '-' && (
+                                <span className="block text-[9px] text-emerald-400 font-normal">P: {item.anoRepasse}</span>
+                              )}
+                            </td>
+                            <td className="p-3 font-semibold">
+                              {item.proponente}
+                              <div className="text-[10px] text-blue-500 font-bold uppercase mt-0.5">
+                                {item.codInst}
+                                {item.rp && <span className="text-emerald-500 ml-1">• {item.rp}</span>}
+                                {item.codPrograma && <span className="text-purple-500 ml-1">• {item.codPrograma}</span>}
                               </div>
-                            )}
-                          </td>
-                          <td className="p-3 text-right font-medium whitespace-nowrap">{fmtR$(item.global)}</td>
-                          <td className="p-3 text-right text-amber-500 font-medium whitespace-nowrap">
-                            {item.instrumento === 'TED' ? <span className="text-blue-500 text-[10px] font-bold">N/A (TED)</span> : fmtR$(item.empenho)}
-                          </td>
-                          <td className={`p-3 text-right font-bold whitespace-nowrap ${item.repassado > 0 ? 'text-emerald-500' : 'text-rose-500'}`}>
-                            {fmtR$(item.repassado)}
-                          </td>
-                          <td className="p-3 whitespace-normal break-words min-w-[180px] max-w-xs">{item.obs}</td>
-                        </tr>
-                      ))}
+                            </td>
+                            <td className="p-3 text-center font-mono text-cyan-500 font-medium whitespace-nowrap">{item.numSEI}</td>
+                            <td className="p-3 text-center font-medium text-amber-400 whitespace-nowrap">{item.parlamentar}</td>
+                            <td className="p-3 text-center font-bold">{item.uf}</td>
+                            <td className="p-3 text-center whitespace-nowrap print-hide-col">{item.inicioVigencia}</td>
+                            <td className="p-3 text-center whitespace-nowrap">
+                              <div className="font-bold">{item.fimVigencia}</div>
+                              <div className="mt-0.5">
+                                <span className={`text-[9px] px-2 py-0.5 rounded-full font-black uppercase ${risk.badgeBg}`}>
+                                  {risk.icon} {risk.label}
+                                </span>
+                              </div>
+                            </td>
+                            <td className="p-3 text-right font-medium whitespace-nowrap">{fmtR$(item.global)}</td>
+                            <td className="p-3 text-right text-amber-500 font-medium whitespace-nowrap">
+                              {item.instrumento === 'TED' ? <span className="text-blue-500 text-[10px] font-bold">N/A (TED)</span> : fmtR$(item.empenho)}
+                            </td>
+                            <td className={`p-3 text-right font-bold whitespace-nowrap ${item.repassado > 0 ? 'text-emerald-500' : 'text-rose-500'}`}>
+                              {fmtR$(item.repassado)}
+                            </td>
+                            <td className="p-3 whitespace-normal break-words min-w-[200px] max-w-xs text-slate-300">{item.obs}</td>
+                          </tr>
+                        );
+                      })}
                     </tbody>
                   </table>
                 </div>
