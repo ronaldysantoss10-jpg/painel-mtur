@@ -499,7 +499,7 @@
 
       const currentYear = new Date().getFullYear();
 
-      // PARSER ROBUSTO DE DADOS DA PLANILHA
+      // PARSER COMPLETO E SEGURO
       const processWorkbook = (wb, sourceName = 'Planilha de Emendas - Resumida.xlsx') => {
         let allRows = [];
         let budgetMap = {};
@@ -524,7 +524,7 @@
           }
 
           let instrumento = '';
-          if (sheetLower.includes('convên')) instrumento = 'Convênio';
+          if (sheetLower.includes('convên') || sheetLower.includes('convenio')) instrumento = 'Convênio';
           else if (sheetLower.includes('fomento')) instrumento = 'Termo de Fomento';
           else if (sheetLower === 'ted' || sheetLower.includes('ted ')) instrumento = 'TED';
           else return;
@@ -570,15 +570,13 @@
             if (!row || row.length === 0) continue;
 
             const proponente = idxProponente !== -1 ? String(row[idxProponente] || '').trim() : '';
-            if (!proponente || proponente.toLowerCase().includes('total') || proponente.toLowerCase().includes('nome do proponente')) continue;
-
             const globalVal = idxGlobal !== -1 ? parseVal(row[idxGlobal]) : 0;
             const repassePropostaVal = idxRepasseProposta !== -1 ? parseVal(row[idxRepasseProposta]) : globalVal;
             let empenhoVal = instrumento === 'TED' ? globalVal : (idxEmpenho !== -1 ? parseVal(row[idxEmpenho]) : 0);
             const repassadoVal = idxRepassado !== -1 ? parseVal(row[idxRepassado]) : 0;
 
-            // IGNORA LINHAS VAZIAS OU ZERADAS DE RASCUNHO NA PLANILHA
-            if (globalVal === 0 && empenhoVal === 0 && repassadoVal === 0 && (!proponente || proponente === '-')) {
+            // FILTRAGEM RIGOROSA: descarta linhas totalmente sem dados da planilha
+            if ((!proponente || proponente === '-' || proponente.toLowerCase().includes('total') || proponente.toLowerCase().includes('nome do proponente')) && globalVal === 0 && empenhoVal === 0 && repassadoVal === 0) {
               continue;
             }
 
@@ -626,7 +624,7 @@
               instrumento,
               codInst: codInst || instrumento,
               rp: rpVal || 'RP Não Ind.',
-              proponente,
+              proponente: proponente || 'N/A',
               parlamentar: parlamentar || '-',
               numSEI: numSEI || '-',
               codPrograma,
@@ -653,22 +651,42 @@
         setFileName(sourceName);
       };
 
+      // TENTATIVAS MÚLTIPLAS COM MULTI-PATH PARA O VERCEL (SOLUÇÃO CASE SENSITIVE)
       useEffect(() => {
         if (!isAuthenticated) return;
 
         const loadDefaultSheet = async () => {
           setIsLoading(true);
-          try {
-            const response = await fetch('./Planilha de Emendas - Resumida.xlsx');
-            if (!response.ok) throw new Error('Planilha padrão não encontrada no repositório.');
-            const arrayBuffer = await response.arrayBuffer();
-            const wb = XLSX.read(arrayBuffer, { type: 'array' });
-            processWorkbook(wb, 'Planilha de Emendas - Resumida.xlsx (Automático)');
-          } catch (err) {
-            console.log('Sem planilha padrão disponível no servidor, aguardando envio manual:', err.message);
-          } finally {
-            setIsLoading(false);
+          const posiblesNombres = [
+            './Planilha de Emendas - Resumida.xlsx',
+            './planilha-de-emendas-resumida.xlsx',
+            './planilha_de_emendas_resumida.xlsx',
+            './Planilha_de_Emendas_Resumida.xlsx',
+            './Planilha de Emendas.xlsx',
+            './planilha.xlsx'
+          ];
+
+          let success = false;
+
+          for (const path of posiblesNombres) {
+            try {
+              const response = await fetch(path);
+              if (response.ok) {
+                const arrayBuffer = await response.arrayBuffer();
+                const wb = XLSX.read(arrayBuffer, { type: 'array' });
+                processWorkbook(wb, path.replace('./', ''));
+                success = true;
+                break;
+              }
+            } catch (err) {
+              // continua para o próximo nome
+            }
           }
+
+          if (!success) {
+            console.warn('Nenhum arquivo padrão encontrado na pasta pública do servidor.');
+          }
+          setIsLoading(false);
         };
 
         loadDefaultSheet();
@@ -1393,7 +1411,7 @@
               <div className="text-6xl animate-bounce">📊</div>
               <h2 className="text-2xl font-bold">Nenhuma Planilha Carregada</h2>
               <p className={`text-sm max-w-md mx-auto ${isLightMode ? 'text-slate-600' : 'text-slate-400'}`}>
-                Envie a planilha de dados pelo botão verde superior para alimentar o painel ou envie um arquivo <strong>Planilha de Emendas - Resumida.xlsx</strong> junto aos arquivos do site.
+                Envie a planilha de dados pelo botão verde superior para alimentar o painel ou certifique-se de nomear o arquivo no GitHub para <strong>Planilha de Emendas - Resumida.xlsx</strong>.
               </p>
             </div>
           ) : (
