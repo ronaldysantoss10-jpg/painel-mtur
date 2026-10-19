@@ -654,7 +654,7 @@
 
       const currentYear = new Date().getFullYear();
 
-      // PARSER DA PLANILHA COM FILTRO ESTRITO DE DADOS ZERADOS
+      // PARSER DA PLANILHA COM SUPORTE AMPLO
       const processWorkbook = (wb, sourceName = 'Google Sheets (Ao Vivo)') => {
         let allRows = [];
         let budgetMap = {};
@@ -684,7 +684,7 @@
           if (matrix.length < 2) return;
 
           let headerIdx = -1;
-          for (let i = 0; i < Math.min(6, matrix.length); i++) {
+          for (let i = 0; i < Math.min(10, matrix.length); i++) {
             const rowStr = matrix[i].map(c => String(c).toLowerCase()).join(' ');
             if (rowStr.includes('proponente') || rowStr.includes('objeto') || rowStr.includes('parlamentar') || rowStr.includes('modalidade') || rowStr.includes('sei')) {
               headerIdx = i;
@@ -731,7 +731,6 @@
             let empenhoVal = instrumento === 'TED' ? globalVal : (idxEmpenho !== -1 ? parseVal(row[idxEmpenho]) : 0);
             const repassadoVal = idxRepassado !== -1 ? parseVal(row[idxRepassado]) : 0;
 
-            // ELIMINA DADOS ZERADOS FANTASMA (RASCUNHOS OU LINHAS DE MODELO DA PLANILHA)
             if (globalVal === 0 && empenhoVal === 0 && repassadoVal === 0) {
               continue;
             }
@@ -811,7 +810,7 @@
         setFileName(sourceName);
       };
 
-      // CARREGAMENTO AUTOMÁTICO DO GOOGLE SHEETS
+      // CARREGAMENTO AUTOMÁTICO DO GOOGLE SHEETS SEM CACHE E EM MODO BRUTO
       useEffect(() => {
         if (!isAuthenticated) return;
 
@@ -819,18 +818,19 @@
           setIsLoading(true);
 
           try {
-            const response = await fetch(GOOGLE_SHEETS_CSV_URL);
+            const timestampUrl = `${GOOGLE_SHEETS_CSV_URL}&t=${new Date().getTime()}`;
+            const response = await fetch(timestampUrl);
+            
             if (!response.ok) {
               throw new Error('Falha ao conectar com a planilha do Google Sheets');
             }
 
             const csvText = await response.text();
-            const wb = XLSX.read(csvText, { type: 'string' });
+            const wb = XLSX.read(csvText, { type: 'string', raw: true });
             processWorkbook(wb, 'Google Sheets (Ao Vivo)');
           } catch (err) {
             console.error('Erro ao buscar Google Sheets:', err);
             
-            // Tentativa de fallback para arquivos locais caso a conexão falhe
             const nomesArquivos = [
               'Planilha de Emendas - Resumida.xlsx',
               'planilha-de-emendas-resumida.xlsx',
@@ -850,9 +850,7 @@
                   carregado = true;
                   break;
                 }
-              } catch (e) {
-                // Tenta o próximo
-              }
+              } catch (e) {}
             }
 
             if (!carregado) {
