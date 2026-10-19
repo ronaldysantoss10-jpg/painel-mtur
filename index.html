@@ -977,6 +977,7 @@
               !item.parlamentar.toLowerCase().includes(search.toLowerCase()) && 
               !item.obs.toLowerCase().includes(search.toLowerCase()) && 
               !item.numSEI.toLowerCase().includes(search.toLowerCase()) &&
+              !item.codInst.toLowerCase().includes(search.toLowerCase()) &&
               !item.codPrograma.toLowerCase().includes(search.toLowerCase())) return false;
           return true;
         });
@@ -1037,7 +1038,7 @@
           'Ano Celebração': d.ano,
           'Ano Repasse': d.anoRepasse,
           'Instrumento': d.instrumento,
-          'Código': d.codInst,
+          'Número Proposta / Código': d.codInst,
           'Modalidade': d.rp,
           'Proponente': d.proponente,
           'Parlamentar': d.parlamentar,
@@ -2001,13 +2002,15 @@
                               <span className="text-sky-400 hover:underline flex items-center gap-1.5">
                                 <span>🔍</span> {item.proponente}
                               </span>
-                              <div className="text-[10px] text-blue-500 font-bold uppercase mt-0.5">
-                                {item.codInst}
-                                {item.rp && <span className="text-emerald-500 ml-1">• {item.rp}</span>}
-                                {item.codPrograma && <span className="text-purple-500 ml-1">• {item.codPrograma}</span>}
-                              </div>
                             </td>
-                            <td className="p-3 text-center font-mono text-cyan-500 font-medium whitespace-nowrap">{item.numSEI}</td>
+                            <td className="p-3 text-center font-mono whitespace-nowrap">
+                              <span className="block text-[10px] font-bold text-amber-400 uppercase">
+                                {item.codInst}
+                              </span>
+                              <span className="text-cyan-400 font-medium text-xs">
+                                {item.numSEI}
+                              </span>
+                            </td>
                             <td className="p-3 text-center font-medium text-amber-400 whitespace-nowrap">{item.parlamentar}</td>
                             <td className="p-3 text-center font-bold">{item.uf}</td>
                             <td className="p-3 text-center whitespace-nowrap print-hide-col">{item.inicioVigencia}</td>
