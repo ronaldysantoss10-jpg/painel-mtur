@@ -6,7 +6,7 @@
   <title>Painel Executivo de Monitoramento - MTur</title>
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- SheetJS para ler e gerar Excel -->
+  <!-- SheetJS para ler e gerar Excel/CSV -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <!-- React & ReactDOM -->
   <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
@@ -127,6 +127,9 @@
 
   <script type="text/babel">
     const { useState, useMemo, useEffect, useRef } = React;
+
+    // URL da Planilha Google publicada em CSV
+    const GOOGLE_SHEETS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSbpjlMYY8TA0KWE--FZ8167mOC8CbkJ_vhLdu3ujgOr4alrymKy3NN-vHuSdErXUsX8CaUdHn6JqPL/pub?output=csv";
 
     const fmtR$ = (val) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(val || 0);
 
@@ -652,7 +655,7 @@
       const currentYear = new Date().getFullYear();
 
       // PARSER DA PLANILHA COM FILTRO ESTRITO DE DADOS ZERADOS
-      const processWorkbook = (wb, sourceName = 'Planilha de Emendas - Resumida.xlsx') => {
+      const processWorkbook = (wb, sourceName = 'Google Sheets (Ao Vivo)') => {
         let allRows = [];
         let budgetMap = {};
 
@@ -675,12 +678,6 @@
             return;
           }
 
-          let instrumento = '';
-          if (sheetLower.includes('convên') || sheetLower.includes('convenio')) instrumento = 'Convênio';
-          else if (sheetLower.includes('fomento')) instrumento = 'Termo de Fomento';
-          else if (sheetLower === 'ted' || sheetLower.includes('ted ')) instrumento = 'TED';
-          else return;
-
           const ws = wb.Sheets[sheetName];
           const matrix = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
 
@@ -695,7 +692,7 @@
             }
           }
 
-          if (headerIdx === -1) headerIdx = 1;
+          if (headerIdx === -1) headerIdx = 0;
 
           const headers = matrix[headerIdx].map(h => String(h).trim().toLowerCase());
           const findColIdx = (terms) => headers.findIndex(h => terms.some(t => h.includes(t)));
@@ -704,7 +701,7 @@
           const idxProponente = findColIdx(['proponente', 'nome', 'convenente']);
           const idxParlamentar = findColIdx(['parlamentar', 'deputado', 'senador', 'autor']);
           const idxUF = findColIdx(['uf', 'estado']);
-          const idxInstrumento = findColIdx(['instrumento', 'número', 'numero', 'nº', 'convênio']);
+          const idxInstrumento = findColIdx(['tipo', 'instrumento', 'número', 'numero', 'nº', 'convênio']);
           const idxModalidade = findColIdx(['modalidade', 'mod', 'mod. aplic', 'mod.aplic.', 'rp']);
           const idxSEI = findColIdx(['nº sei', 'sei', 'numero sei', 'número sei', 'processo sei', 'processo']);
           const idxPrograma = findColIdx(['código do programa', 'codigo do programa', 'cod. programa', 'programa']);
@@ -724,6 +721,13 @@
             const proponente = idxProponente !== -1 ? String(row[idxProponente] || '').trim() : '';
             const globalVal = idxGlobal !== -1 ? parseVal(row[idxGlobal]) : 0;
             const repassePropostaVal = idxRepasseProposta !== -1 ? parseVal(row[idxRepasseProposta]) : globalVal;
+
+            let rawTipo = idxInstrumento !== -1 && row[idxInstrumento] ? String(row[idxInstrumento]).trim() : '';
+            let instrumento = 'Convênio';
+            if (rawTipo.toLowerCase().includes('fomento')) instrumento = 'Termo de Fomento';
+            else if (rawTipo.toLowerCase().includes('ted')) instrumento = 'TED';
+            else if (rawTipo.toLowerCase().includes('convên') || rawTipo.toLowerCase().includes('convenio')) instrumento = 'Convênio';
+
             let empenhoVal = instrumento === 'TED' ? globalVal : (idxEmpenho !== -1 ? parseVal(row[idxEmpenho]) : 0);
             const repassadoVal = idxRepassado !== -1 ? parseVal(row[idxRepassado]) : 0;
 
@@ -739,7 +743,7 @@
             const parlamentar = idxParlamentar !== -1 && row[idxParlamentar] ? String(row[idxParlamentar]).trim() : '-';
             const uf = idxUF !== -1 && row[idxUF] ? String(row[idxUF]).trim().toUpperCase() : 'BR';
             const anoCelebracao = idxAno !== -1 && row[idxAno] ? String(row[idxAno]).split('.')[0].trim() : String(currentYear);
-            const codInst = idxInstrumento !== -1 && row[idxInstrumento] ? String(row[idxInstrumento]).trim() : '';
+            const codInst = rawTipo || instrumento;
             const numSEI = idxSEI !== -1 && row[idxSEI] ? String(row[idxSEI]).trim() : '-';
             
             let rawPrograma = idxPrograma !== -1 && row[idxPrograma] ? String(row[idxPrograma]).trim() : '';
@@ -807,47 +811,59 @@
         setFileName(sourceName);
       };
 
-      // TENTATIVA COMPATÍVEL COM URLS DO VERCEL E NORMAS DE HOSPEDAGEM WEB
+      // CARREGAMENTO AUTOMÁTICO DO GOOGLE SHEETS
       useEffect(() => {
         if (!isAuthenticated) return;
 
-        const loadDefaultSheet = async () => {
+        const loadGoogleSheet = async () => {
           setIsLoading(true);
 
-          const nomesArquivos = [
-            'Planilha de Emendas - Resumida.xlsx',
-            'planilha-de-emendas-resumida.xlsx',
-            'Planilha_de_Emendas_Resumida.xlsx',
-            'planilha.xlsx'
-          ];
-
-          let carregado = false;
-
-          for (const nome of nomesArquivos) {
-            try {
-              // Converte caminhos com espaço para URL Vercel segura (%20)
-              const urlEncoded = `./${encodeURIComponent(nome)}`;
-              const response = await fetch(urlEncoded);
-              if (response.ok) {
-                const arrayBuffer = await response.arrayBuffer();
-                const wb = XLSX.read(arrayBuffer, { type: 'array' });
-                processWorkbook(wb, nome);
-                carregado = true;
-                break;
-              }
-            } catch (err) {
-              // Tenta o próximo nome
+          try {
+            const response = await fetch(GOOGLE_SHEETS_CSV_URL);
+            if (!response.ok) {
+              throw new Error('Falha ao conectar com a planilha do Google Sheets');
             }
-          }
 
-          if (!carregado) {
-            console.log('Sem planilha padrão disponível no Vercel. Utilize o botão para subir o arquivo manualmente.');
-          }
+            const csvText = await response.text();
+            const wb = XLSX.read(csvText, { type: 'string' });
+            processWorkbook(wb, 'Google Sheets (Ao Vivo)');
+          } catch (err) {
+            console.error('Erro ao buscar Google Sheets:', err);
+            
+            // Tentativa de fallback para arquivos locais caso a conexão falhe
+            const nomesArquivos = [
+              'Planilha de Emendas - Resumida.xlsx',
+              'planilha-de-emendas-resumida.xlsx',
+              'Planilha_de_Emendas_Resumida.xlsx',
+              'planilha.xlsx'
+            ];
 
-          setIsLoading(false);
+            let carregado = false;
+            for (const nome of nomesArquivos) {
+              try {
+                const urlEncoded = `./${encodeURIComponent(nome)}`;
+                const response = await fetch(urlEncoded);
+                if (response.ok) {
+                  const arrayBuffer = await response.arrayBuffer();
+                  const wb = XLSX.read(arrayBuffer, { type: 'array' });
+                  processWorkbook(wb, nome);
+                  carregado = true;
+                  break;
+                }
+              } catch (e) {
+                // Tenta o próximo
+              }
+            }
+
+            if (!carregado) {
+              console.log('Sem planilha alternativa local. Utilize o botão de upload manual.');
+            }
+          } finally {
+            setIsLoading(false);
+          }
         };
 
-        loadDefaultSheet();
+        loadGoogleSheet();
       }, [isAuthenticated]);
 
       const handleLogin = (e) => {
@@ -1545,7 +1561,7 @@
               {!presentationMode && (
                 <label className="cursor-pointer bg-emerald-600 hover:bg-emerald-500 text-white font-semibold px-4 py-2 rounded-xl text-xs transition-all shadow-lg flex items-center justify-center gap-2">
                   <span>📂 {fileName ? `Fonte: ${fileName}` : 'Carregar Outro Excel'}</span>
-                  <input type="file" accept=".xlsx, .xls" onChange={handleFileUpload} className="hidden" />
+                  <input type="file" accept=".xlsx, .xls, .csv" onChange={handleFileUpload} className="hidden" />
                 </label>
               )}
 
@@ -1562,14 +1578,14 @@
           {isLoading ? (
             <div className={`border rounded-3xl p-12 text-center space-y-4 ${isLightMode ? 'bg-white border-slate-300' : 'bg-slate-900/60 border-slate-800'}`}>
               <div className="text-4xl animate-spin">⏳</div>
-              <h2 className="text-xl font-bold">Carregando dados da planilha...</h2>
+              <h2 className="text-xl font-bold">Sincronizando com Google Sheets ao vivo...</h2>
             </div>
           ) : data.length === 0 ? (
             <div className={`border-2 border-dashed rounded-3xl p-12 text-center space-y-4 ${isLightMode ? 'bg-white border-slate-300' : 'bg-slate-900/60 border-slate-800'}`}>
               <div className="text-6xl animate-bounce">📊</div>
-              <h2 className="text-2xl font-bold">Nenhuma Planilha Carregada</h2>
+              <h2 className="text-2xl font-bold">Nenhum Dado Encontrado</h2>
               <p className={`text-sm max-w-md mx-auto ${isLightMode ? 'text-slate-600' : 'text-slate-400'}`}>
-                Envie a planilha de dados pelo botão verde superior para alimentar o painel ou certifique-se de que o arquivo no GitHub se chama <strong>Planilha de Emendas - Resumida.xlsx</strong>.
+                Verifique se o link público do Google Sheets está ativo ou faça o upload manual usando o botão verde superior.
               </p>
             </div>
           ) : (
