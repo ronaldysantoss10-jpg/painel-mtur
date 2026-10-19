@@ -388,8 +388,8 @@
               </div>
 
               <div className={`p-3.5 rounded-2xl border ${isLightMode ? 'bg-slate-50 border-slate-200' : 'bg-slate-950/60 border-slate-800'}`}>
-                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">Instrumento / Código</span>
-                <span className="font-mono text-xs sm:text-sm font-bold text-purple-400 truncate block">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">Nº Proposta / Código</span>
+                <span className="font-mono text-xs sm:text-sm font-bold text-amber-400 truncate block">
                   {item.codInst}
                 </span>
               </div>
@@ -704,7 +704,7 @@
           const idxProponente = findColIdx(['proponente', 'nome', 'convenente']);
           const idxParlamentar = findColIdx(['parlamentar', 'deputado', 'senador', 'autor']);
           const idxUF = findColIdx(['uf', 'estado']);
-          const idxInstrumento = findColIdx(['instrumento', 'número', 'numero', 'nº', 'convênio']);
+          const idxInstrumento = findColIdx(['instrumento', 'número', 'numero', 'nº', 'convênio', 'proposta']);
           const idxModalidade = findColIdx(['modalidade', 'mod', 'mod. aplic', 'mod.aplic.', 'rp']);
           const idxSEI = findColIdx(['nº sei', 'sei', 'numero sei', 'número sei', 'processo sei', 'processo']);
           const idxPrograma = findColIdx(['código do programa', 'codigo do programa', 'cod. programa', 'programa']);
@@ -739,7 +739,7 @@
             const parlamentar = idxParlamentar !== -1 && row[idxParlamentar] ? String(row[idxParlamentar]).trim() : '-';
             const uf = idxUF !== -1 && row[idxUF] ? String(row[idxUF]).trim().toUpperCase() : 'BR';
             const anoCelebracao = idxAno !== -1 && row[idxAno] ? String(row[idxAno]).split('.')[0].trim() : String(currentYear);
-            const codInst = idxInstrumento !== -1 && row[idxInstrumento] ? String(row[idxInstrumento]).trim() : '';
+            const codInst = idxInstrumento !== -1 && row[idxInstrumento] ? String(row[idxInstrumento]).trim() : '-';
             const numSEI = idxSEI !== -1 && row[idxSEI] ? String(row[idxSEI]).trim() : '-';
             
             let rawPrograma = idxPrograma !== -1 && row[idxPrograma] ? String(row[idxPrograma]).trim() : '';
@@ -778,7 +778,7 @@
             allRows.push({
               id: `${sheetName}-${r}`,
               instrumento,
-              codInst: codInst || instrumento,
+              codInst: codInst || '-',
               rp: rpVal || 'RP Não Ind.',
               proponente: proponente || 'N/A',
               parlamentar: parlamentar || '-',
@@ -977,6 +977,7 @@
               !item.parlamentar.toLowerCase().includes(search.toLowerCase()) && 
               !item.obs.toLowerCase().includes(search.toLowerCase()) && 
               !item.numSEI.toLowerCase().includes(search.toLowerCase()) &&
+              !item.codInst.toLowerCase().includes(search.toLowerCase()) &&
               !item.codPrograma.toLowerCase().includes(search.toLowerCase())) return false;
           return true;
         });
@@ -1037,11 +1038,11 @@
           'Ano Celebração': d.ano,
           'Ano Repasse': d.anoRepasse,
           'Instrumento': d.instrumento,
-          'Código': d.codInst,
-          'Modalidade': d.rp,
           'Proponente': d.proponente,
-          'Parlamentar': d.parlamentar,
+          'Nº Proposta': d.codInst,
           'Nº SEI': d.numSEI,
+          'Modalidade': d.rp,
+          'Parlamentar': d.parlamentar,
           'UF': d.uf,
           'Início Vigência': d.inicioVigencia,
           'Fim Vigência': d.fimVigencia,
@@ -1952,6 +1953,9 @@
                         <th onClick={() => handleSort('proponente')} className="p-3 cursor-pointer hover:text-blue-500 whitespace-nowrap">
                           Proponente / Instrumento {renderSortIndicator('proponente')}
                         </th>
+                        <th onClick={() => handleSort('codInst')} className="p-3 text-center cursor-pointer hover:text-blue-500 whitespace-nowrap">
+                          Nº Proposta {renderSortIndicator('codInst')}
+                        </th>
                         <th onClick={() => handleSort('numSEI')} className="p-3 text-center cursor-pointer hover:text-blue-500 whitespace-nowrap">
                           Nº SEI {renderSortIndicator('numSEI')}
                         </th>
@@ -2002,12 +2006,17 @@
                                 <span>🔍</span> {item.proponente}
                               </span>
                               <div className="text-[10px] text-blue-500 font-bold uppercase mt-0.5">
-                                {item.codInst}
+                                {item.instrumento}
                                 {item.rp && <span className="text-emerald-500 ml-1">• {item.rp}</span>}
                                 {item.codPrograma && <span className="text-purple-500 ml-1">• {item.codPrograma}</span>}
                               </div>
                             </td>
-                            <td className="p-3 text-center font-mono text-cyan-500 font-medium whitespace-nowrap">{item.numSEI}</td>
+                            <td className="p-3 text-center font-mono font-bold text-amber-400 whitespace-nowrap">
+                              {item.codInst}
+                            </td>
+                            <td className="p-3 text-center font-mono text-cyan-400 font-medium whitespace-nowrap">
+                              {item.numSEI}
+                            </td>
                             <td className="p-3 text-center font-medium text-amber-400 whitespace-nowrap">{item.parlamentar}</td>
                             <td className="p-3 text-center font-bold">{item.uf}</td>
                             <td className="p-3 text-center whitespace-nowrap print-hide-col">{item.inicioVigencia}</td>
