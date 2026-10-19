@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Painel Executivo de Monitoramento - MTur</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- PapaParse para conversão de CSV -->
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  <!-- SheetJS para ler e exportar Excel -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <!-- React & ReactDOM -->
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen font-sans antialiased">
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect } = React;
+
+    // COLE AQUI O SEU LINK DE PUBLICAÇÃO DA PLANILHA DO GOOGLE SHEETS
+    // Certifique-se de que o final do link contenha /pub?output=csv ou trocaremos automaticamente
+    const RAW_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSbpjlMYY8TA0KWE--FZ8167mOC8CbkJ_vhLdu3ujgOr4alrymKy3NN-vHuSdErXUsX8CaUdHn6JqPL/pub?output=csv";
+
+    // Garante conversão correta para CSV
+    const GOOGLE_CSV_ENDPOINT = RAW_URL.includes('/pub') 
+      ? RAW_URL.replace(/\/pubhtml.*$/, '/pub?output=csv').replace(/\/pub\?.*$/, '/pub?output=csv')
+      : RAW_URL;
+
+    const fmtR$ = (val) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(val || 0);
+
+    function App() {
+      const [dados, setDados] = useState([]);
+      const [carregando, setCarregando] = useState(true);
+      const [erro, setErro] = useState(null);
+
+      const carregarPlanilha = () => {
+        setCarregando(true);
+        setErro(null);
+
+        // Adicionamos timestamp no parâmetro para evitar cache do navegador e trazer dados ao vivo
+        const urlSemCache = `${GOOGLE_CSV_ENDPOINT}&t=${new Date().getTime()}`;
+
+        Papa.parse(urlSemCache, {
+          download: true,
+          header: true,
+          skipEmptyLines: true,
+          complete: (results) => {
+            if (results.data && results.data.length > 0) {
+              setDados(results.data);
+            } else {
+              setErro("A planilha foi lida, mas não retornou nenhuma linha válida.");
+            }
+            setCarregando(false);
+          },
+          error: (err) => {
+            console.error("Erro no PapaParse:", err);
+            setErro("Não foi possível conectar à planilha. Verifique se ela está publicada na Web em formato CSV.");
+            setCarregando(false);
+          }
+        });
+      };
+
+      useEffect(() => {
+        carregarPlanilha();
+      }, []);
+
+      return (
+        <div className="p-6 max-w-7xl mx-auto space-y-6">
+          <header className="flex flex-col md:flex-row justify-between items-center border-b border-slate-800 pb-4 gap-4">
+            <div>
+              <h1 className="text-2xl font-black text-sky-400">Painel de Monitoramento MTur (Conexão GitHub)</h1>
+              <p className="text-xs text-slate-400">Sincronizado diretamente com a planilha do Google Sheets</p>
+            </div>
+            
+            <button 
+              onClick={carregarPlanilha}
+              className="bg-sky-600 hover:bg-sky-500 text-white font-bold px-4 py-2 rounded-xl text-xs transition-all shadow-md flex items-center gap-2"
+            >
+              🔄 Atualizar Dados Agora
+            </button>
+          </header>
+
+          {carregando && (
+            <div className="p-12 text-center border border-slate-800 rounded-2xl bg-slate-900/50">
+              <p className="text-lg font-semibold text-sky-400 animate-pulse">Conectando ao Google Sheets...</p>
+            </div>
+          )}
+
+          {erro && (
+            <div className="p-6 border border-rose-500/30 bg-rose-950/20 text-rose-300 rounded-2xl text-center space-y-2">
+              <p className="font-bold">⚠️ Erro na Conexão</p>
+              <p className="text-xs">{erro}</p>
+            </div>
+          )}
+
+          {!carregando && !erro && (
+            <div className="space-y-4">
+              <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex justify-between items-center">
+                <span className="text-xs font-bold text-slate-400 uppercase">Registros Carregados</span>
+                <span className="text-lg font-black text-emerald-400">{dados.length} linhas</span>
+              </div>
+
+              <div className="border border-slate-800 rounded-2xl overflow-x-auto bg-slate-900">
+                <table className="w-full text-left text-xs">
+                  <thead className="bg-slate-950 text-slate-400 uppercase border-b border-slate-800">
+                    <tr>
+                      {dados[0] && Object.keys(dados[0]).slice(0, 8).map((col, idx) => (
+                        <th key={idx} className="p-3 font-bold">{col}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-800/50">
+                    {dados.slice(0, 50).map((row, i) => (
+                      <tr key={i} className="hover:bg-slate-800/40 transition-colors">
+                        {Object.keys(row).slice(0, 8).map((col, idx) => (
+                          <td key={idx} className="p-3 text-slate-300">{row[col] || '-'}</td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>
