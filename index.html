@@ -153,11 +153,11 @@
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.font = 'bold 9px sans-serif';
-        ctx.fillStyle = '#94a3b8';
+        ctx.fillStyle = chart.options.plugins.centerTextColor || '#94a3b8';
         ctx.fillText('TOTAL REAL', centerX, centerY - 10);
 
         ctx.font = 'bold 12px sans-serif';
-        ctx.fillStyle = '#38bdf8';
+        ctx.fillStyle = chart.options.plugins.centerValueColor || '#38bdf8';
         ctx.fillText(fmtR$(totalVisivel), centerX, centerY + 8);
         ctx.restore();
       }
@@ -230,41 +230,41 @@
           {singleSelectedUF && focusedInfo && (
             <div className={`absolute top-2 left-2 z-20 border rounded-2xl p-4 shadow-2xl backdrop-blur-xl animate-fadeIn transition-all text-xs max-w-[240px] w-full ${
               isLightMode 
-                ? 'bg-white/90 border-slate-200/80 text-slate-800 shadow-slate-300/50' 
+                ? 'bg-white/95 border-slate-300 text-slate-900 shadow-slate-300/60' 
                 : 'bg-slate-900/85 border-slate-700/60 text-slate-100 shadow-black/80'
             }`}>
               <div className="flex items-center justify-between border-b pb-2 mb-3 border-emerald-500/30">
                 <div className="flex items-center gap-2">
                   <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                  <span className="font-black text-sm tracking-wide text-emerald-400">
+                  <span className={`font-black text-sm tracking-wide ${isLightMode ? 'text-emerald-700' : 'text-emerald-400'}`}>
                     {ufNames[singleSelectedUF]} ({singleSelectedUF})
                   </span>
                 </div>
-                <span className="text-[10px] bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
+                <span className={`text-[10px] border font-bold px-2 py-0.5 rounded-full uppercase tracking-wider ${isLightMode ? 'bg-emerald-100 border-emerald-300 text-emerald-800' : 'bg-emerald-500/15 border-emerald-500/30 text-emerald-400'}`}>
                   Focado
                 </span>
               </div>
 
               <div className="space-y-2 text-[11px] font-medium">
-                <div className="flex items-center justify-between p-1.5 rounded-lg bg-slate-800/20">
-                  <span className="text-slate-400">Vol. Global:</span>
-                  <span className="font-extrabold text-slate-100">{fmtR$(focusedInfo.total)}</span>
+                <div className={`flex items-center justify-between p-1.5 rounded-lg ${isLightMode ? 'bg-slate-100' : 'bg-slate-800/20'}`}>
+                  <span className={isLightMode ? 'text-slate-600' : 'text-slate-400'}>Vol. Global:</span>
+                  <span className={`font-extrabold ${isLightMode ? 'text-slate-900' : 'text-slate-100'}`}>{fmtR$(focusedInfo.total)}</span>
                 </div>
-                <div className="flex items-center justify-between p-1.5 rounded-lg bg-amber-500/10">
-                  <span className="text-amber-400/90 font-semibold">Empenhado:</span>
-                  <span className="font-bold text-amber-400">{fmtR$(focusedInfo.empenho)}</span>
+                <div className={`flex items-center justify-between p-1.5 rounded-lg ${isLightMode ? 'bg-amber-50' : 'bg-amber-500/10'}`}>
+                  <span className={isLightMode ? 'text-amber-800 font-semibold' : 'text-amber-400/90 font-semibold'}>Empenhado:</span>
+                  <span className={`font-bold ${isLightMode ? 'text-amber-900' : 'text-amber-400'}`}>{fmtR$(focusedInfo.empenho)}</span>
                 </div>
-                <div className="flex items-center justify-between p-1.5 rounded-lg bg-emerald-500/10">
-                  <span className="text-emerald-400/90 font-semibold">Repassado:</span>
-                  <span className="font-bold text-emerald-400">{fmtR$(focusedInfo.repassado)}</span>
+                <div className={`flex items-center justify-between p-1.5 rounded-lg ${isLightMode ? 'bg-emerald-50' : 'bg-emerald-500/10'}`}>
+                  <span className={isLightMode ? 'text-emerald-800 font-semibold' : 'text-emerald-400/90 font-semibold'}>Repassado:</span>
+                  <span className={`font-bold ${isLightMode ? 'text-emerald-900' : 'text-emerald-400'}`}>{fmtR$(focusedInfo.repassado)}</span>
                 </div>
-                <div className="flex items-center justify-between p-1.5 rounded-lg bg-rose-500/10">
-                  <span className="text-rose-400/90 font-semibold">Falta Repassar:</span>
-                  <span className="font-bold text-rose-400">{fmtR$(faltaRepassarFocused)}</span>
+                <div className={`flex items-center justify-between p-1.5 rounded-lg ${isLightMode ? 'bg-rose-50' : 'bg-rose-500/10'}`}>
+                  <span className={isLightMode ? 'text-rose-800 font-semibold' : 'text-rose-400/90 font-semibold'}>Falta Repassar:</span>
+                  <span className={`font-bold ${isLightMode ? 'text-rose-900' : 'text-rose-400'}`}>{fmtR$(faltaRepassarFocused)}</span>
                 </div>
-                <div className="flex items-center justify-between pt-2 border-t border-slate-700/40 px-1">
-                  <span className="text-slate-400">Processos:</span>
-                  <span className="font-black text-sky-400 bg-sky-500/10 px-2 py-0.5 rounded-md border border-sky-500/20">
+                <div className={`flex items-center justify-between pt-2 border-t px-1 ${isLightMode ? 'border-slate-200' : 'border-slate-700/40'}`}>
+                  <span className={isLightMode ? 'text-slate-600' : 'text-slate-400'}>Processos:</span>
+                  <span className={`font-black px-2 py-0.5 rounded-md border ${isLightMode ? 'text-sky-900 bg-sky-100 border-sky-300' : 'text-sky-400 bg-sky-500/10 border-sky-500/20'}`}>
                     {focusedInfo.count || 0}
                   </span>
                 </div>
@@ -285,8 +285,8 @@
                 const faltaRepassarVal = Math.max(0, (ufInfo.empenho || 0) - val);
 
                 const opacity = val > 0 ? Math.max(0.55, val / maxVal) : 0.85;
-                const baseFill = isSelected ? '#10b981' : (val > 0 ? '#0284c7' : (isLightMode ? '#cbd5e1' : '#334155'));
-                const strokeColor = isSelected ? '#ffffff' : (val > 0 ? '#38bdf8' : (isLightMode ? '#94a3b8' : '#64748b'));
+                const baseFill = isSelected ? '#10b981' : (val > 0 ? (isLightMode ? '#0284c7' : '#0284c7') : (isLightMode ? '#cbd5e1' : '#334155'));
+                const strokeColor = isSelected ? '#ffffff' : (val > 0 ? '#38bdf8' : (isLightMode ? '#64748b' : '#64748b'));
 
                 const name = ufNames[uf] || uf;
                 const formattedEmpenho = fmtR$(ufInfo.empenho || 0);
@@ -320,7 +320,7 @@
             </g>
           </svg>
           
-          <div className={`text-[11px] mt-3 flex items-center justify-center gap-4 px-4 py-1.5 rounded-full border shadow-sm print:text-black print:bg-transparent print:border-none ${isLightMode ? 'bg-white text-slate-700 border-slate-200' : 'bg-slate-900/90 text-slate-300 border-slate-800'}`}>
+          <div className={`text-[11px] mt-3 flex items-center justify-center gap-4 px-4 py-1.5 rounded-full border shadow-sm print:text-black print:bg-transparent print:border-none ${isLightMode ? 'bg-white text-slate-800 border-slate-300 font-semibold' : 'bg-slate-900/90 text-slate-300 border-slate-800'}`}>
             <span className="flex items-center gap-1.5 font-medium"><span className="w-2.5 h-2.5 rounded-full bg-sky-600 inline-block shadow-sm"></span> Com Repasse</span>
             <span className="flex items-center gap-1.5 font-medium"><span className="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block shadow-sm"></span> Selecionado</span>
             <span className="flex items-center gap-1.5 font-medium"><span className={`w-2.5 h-2.5 rounded-full border inline-block ${isLightMode ? 'bg-slate-300 border-slate-400' : 'bg-slate-700 border-slate-500'}`}></span> Sem Repasse</span>
@@ -344,24 +344,24 @@
       return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-md p-4 animate-fadeIn">
           <div className={`border rounded-3xl p-6 sm:p-8 w-full max-w-2xl shadow-2xl flex flex-col gap-6 relative transition-all ${
-            isLightMode ? 'bg-white border-slate-200 text-slate-800' : 'bg-slate-900 border-slate-800 text-slate-100'
+            isLightMode ? 'bg-white border-slate-300 text-slate-900' : 'bg-slate-900 border-slate-800 text-slate-100'
           }`}>
             
             {/* CABEÇALHO DA FICHA */}
-            <div className="flex items-start justify-between border-b pb-4 border-slate-700/40">
+            <div className={`flex items-start justify-between border-b pb-4 ${isLightMode ? 'border-slate-200' : 'border-slate-700/40'}`}>
               <div className="space-y-1 pr-6">
                 <div className="flex items-center gap-2">
-                  <span className="text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-full bg-blue-600 text-white shadow-sm">
+                  <span className="text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-full bg-blue-700 text-white shadow-sm">
                     Ficha Executiva do Instrumento
                   </span>
-                  <span className="text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-full bg-slate-800 border border-slate-700 text-sky-400">
+                  <span className={`text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-full border ${isLightMode ? 'bg-slate-100 border-slate-300 text-blue-900' : 'bg-slate-800 border-slate-700 text-sky-400'}`}>
                     {item.instrumento}
                   </span>
                 </div>
-                <h2 className="text-xl font-black tracking-tight leading-tight mt-1 text-sky-400">
+                <h2 className={`text-xl font-black tracking-tight leading-tight mt-1 ${isLightMode ? 'text-blue-950' : 'text-sky-400'}`}>
                   {item.proponente}
                 </h2>
-                <p className="text-xs text-slate-400 font-medium flex items-center gap-2 flex-wrap">
+                <p className={`text-xs font-medium flex items-center gap-2 flex-wrap ${isLightMode ? 'text-slate-700' : 'text-slate-400'}`}>
                   <span>UF: <strong>{item.uf}</strong></span> • 
                   <span>Cidade Sede: <strong>{item.cidadeSede}</strong></span> • 
                   <span>Exercício: <strong>{item.ano}</strong></span> • 
@@ -372,7 +372,7 @@
               <button
                 onClick={onClose}
                 className={`w-9 h-9 rounded-full flex items-center justify-center font-bold text-sm transition-all ${
-                  isLightMode ? 'bg-slate-100 hover:bg-slate-200 text-slate-600' : 'bg-slate-800 hover:bg-slate-700 text-slate-300'
+                  isLightMode ? 'bg-slate-100 hover:bg-slate-200 text-slate-800' : 'bg-slate-800 hover:bg-slate-700 text-slate-300'
                 }`}
               >
                 ✕
@@ -381,16 +381,16 @@
 
             {/* DADOS DE IDENTIFICAÇÃO E SEI */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div className={`p-3.5 rounded-2xl border ${isLightMode ? 'bg-slate-50 border-slate-200' : 'bg-slate-950/60 border-slate-800'}`}>
-                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">Processo SEI</span>
-                <span className="font-mono text-xs sm:text-sm font-bold text-cyan-400 select-all block truncate">
+              <div className={`p-3.5 rounded-2xl border ${isLightMode ? 'bg-slate-50 border-slate-300' : 'bg-slate-950/60 border-slate-800'}`}>
+                <span className={`text-[10px] font-bold uppercase tracking-wider block mb-1 ${isLightMode ? 'text-slate-700' : 'text-slate-400'}`}>Processo SEI</span>
+                <span className={`font-mono text-xs sm:text-sm font-bold select-all block truncate ${isLightMode ? 'text-cyan-900' : 'text-cyan-400'}`}>
                   {item.numSEI}
                 </span>
               </div>
 
-              <div className={`p-3.5 rounded-2xl border ${isLightMode ? 'bg-slate-50 border-slate-200' : 'bg-slate-950/60 border-slate-800'}`}>
-                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">Nº Proposta</span>
-                <span className="font-mono text-xs sm:text-sm font-bold text-amber-400 truncate block">
+              <div className={`p-3.5 rounded-2xl border ${isLightMode ? 'bg-slate-50 border-slate-300' : 'bg-slate-950/60 border-slate-800'}`}>
+                <span className={`text-[10px] font-bold uppercase tracking-wider block mb-1 ${isLightMode ? 'text-slate-700' : 'text-slate-400'}`}>Nº Proposta</span>
+                <span className={`font-mono text-xs sm:text-sm font-bold truncate block ${isLightMode ? 'text-amber-900' : 'text-amber-400'}`}>
                   {item.numProposta}
                 </span>
               </div>
@@ -398,34 +398,34 @@
 
             {/* CARDS DE VALORES FINANCEIROS */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              <div className={`p-3 rounded-2xl border ${isLightMode ? 'bg-slate-50 border-slate-200' : 'bg-slate-950/80 border-slate-800'}`}>
-                <span className="text-[10px] text-slate-400 font-semibold block uppercase">Valor Global</span>
+              <div className={`p-3 rounded-2xl border ${isLightMode ? 'bg-slate-50 border-slate-300 text-slate-900' : 'bg-slate-950/80 border-slate-800 text-white'}`}>
+                <span className={`text-[10px] font-semibold block uppercase ${isLightMode ? 'text-slate-700' : 'text-slate-400'}`}>Valor Global</span>
                 <span className="text-sm font-black mt-1 block">{fmtR$(item.global)}</span>
               </div>
 
-              <div className={`p-3 rounded-2xl border ${isLightMode ? 'bg-amber-50/50 border-amber-200' : 'bg-amber-950/20 border-amber-800/40'}`}>
-                <span className="text-[10px] text-amber-500 font-semibold block uppercase">Empenhado</span>
-                <span className="text-sm font-black text-amber-400 mt-1 block">
+              <div className={`p-3 rounded-2xl border ${isLightMode ? 'bg-amber-50 border-amber-300 text-amber-950' : 'bg-amber-950/20 border-amber-800/40 text-amber-400'}`}>
+                <span className={`text-[10px] font-semibold block uppercase ${isLightMode ? 'text-amber-900' : 'text-amber-500'}`}>Empenhado</span>
+                <span className="text-sm font-black mt-1 block">
                   {item.instrumento === 'TED' ? 'N/A (TED)' : fmtR$(item.empenho)}
                 </span>
               </div>
 
-              <div className={`p-3 rounded-2xl border ${isLightMode ? 'bg-emerald-50/50 border-emerald-200' : 'bg-emerald-950/20 border-emerald-800/40'}`}>
-                <span className="text-[10px] text-emerald-500 font-semibold block uppercase">Repassado</span>
-                <span className="text-sm font-black text-emerald-400 mt-1 block">{fmtR$(item.repassado)}</span>
+              <div className={`p-3 rounded-2xl border ${isLightMode ? 'bg-emerald-50 border-emerald-300 text-emerald-950' : 'bg-emerald-950/20 border-emerald-800/40 text-emerald-400'}`}>
+                <span className={`text-[10px] font-semibold block uppercase ${isLightMode ? 'text-emerald-900' : 'text-emerald-500'}`}>Repassado</span>
+                <span className="text-sm font-black mt-1 block">{fmtR$(item.repassado)}</span>
               </div>
 
-              <div className={`p-3 rounded-2xl border ${isLightMode ? 'bg-rose-50/50 border-rose-200' : 'bg-rose-950/20 border-rose-800/40'}`}>
-                <span className="text-[10px] text-rose-500 font-semibold block uppercase">Saldo Repasse</span>
-                <span className="text-sm font-black text-rose-400 mt-1 block">{fmtR$(faltaRepassar)}</span>
+              <div className={`p-3 rounded-2xl border ${isLightMode ? 'bg-rose-50 border-rose-300 text-rose-950' : 'bg-rose-950/20 border-rose-800/40 text-rose-400'}`}>
+                <span className={`text-[10px] font-semibold block uppercase ${isLightMode ? 'text-rose-900' : 'text-rose-500'}`}>Saldo Repasse</span>
+                <span className="text-sm font-black mt-1 block">{fmtR$(faltaRepassar)}</span>
               </div>
             </div>
 
             {/* BARRA DE PROGRESSO DE REPASSE */}
             <div className="space-y-1.5">
               <div className="flex justify-between text-xs font-semibold">
-                <span className="text-slate-400">Progresso do Repasse Financeiro</span>
-                <span className="text-emerald-400 font-bold">{pctExecucao}% Pago</span>
+                <span className={isLightMode ? 'text-slate-700' : 'text-slate-400'}>Progresso do Repasse Financeiro</span>
+                <span className={`font-bold ${isLightMode ? 'text-emerald-800' : 'text-emerald-400'}`}>{pctExecucao}% Pago</span>
               </div>
               <div className={`w-full h-2.5 rounded-full overflow-hidden p-0.5 border ${isLightMode ? 'bg-slate-200 border-slate-300' : 'bg-slate-950 border-slate-800'}`}>
                 <div className="bg-gradient-to-r from-sky-500 via-indigo-500 to-emerald-500 h-full rounded-full transition-all" style={{ width: `${Math.min(pctExecucao, 100)}%` }}></div>
@@ -433,25 +433,25 @@
             </div>
 
             {/* DETALHES COMPLEMENTARES (PARLAMENTAR, PROGRAMA, VIGÊNCIA) */}
-            <div className={`p-4 rounded-2xl border space-y-3 ${isLightMode ? 'bg-slate-50 border-slate-200' : 'bg-slate-950/40 border-slate-800'}`}>
+            <div className={`p-4 rounded-2xl border space-y-3 ${isLightMode ? 'bg-slate-50 border-slate-300' : 'bg-slate-950/40 border-slate-800'}`}>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                 <div>
-                  <span className="text-slate-400 font-medium block">Autor / Parlamentar:</span>
-                  <span className="font-extrabold text-amber-400 text-sm">{item.parlamentar}</span>
+                  <span className={`font-medium block ${isLightMode ? 'text-slate-700' : 'text-slate-400'}`}>Autor / Parlamentar:</span>
+                  <span className={`font-extrabold text-sm ${isLightMode ? 'text-amber-900' : 'text-amber-400'}`}>{item.parlamentar}</span>
                 </div>
 
                 <div>
-                  <span className="text-slate-400 font-medium block">Programa / Ação:</span>
-                  <span className="font-bold text-slate-200">{item.codPrograma}</span>
+                  <span className={`font-medium block ${isLightMode ? 'text-slate-700' : 'text-slate-400'}`}>Programa / Ação:</span>
+                  <span className={`font-bold ${isLightMode ? 'text-slate-900' : 'text-slate-200'}`}>{item.codPrograma}</span>
                 </div>
 
                 <div>
-                  <span className="text-slate-400 font-medium block">Período de Vigência:</span>
-                  <span className="font-semibold text-slate-300">{item.inicioVigencia} até {item.fimVigencia}</span>
+                  <span className={`font-medium block ${isLightMode ? 'text-slate-700' : 'text-slate-400'}`}>Período de Vigência:</span>
+                  <span className={`font-semibold ${isLightMode ? 'text-slate-900' : 'text-slate-300'}`}>{item.inicioVigencia} até {item.fimVigencia}</span>
                 </div>
 
                 <div>
-                  <span className="text-slate-400 font-medium block">Situação do Prazo:</span>
+                  <span className={`font-medium block ${isLightMode ? 'text-slate-700' : 'text-slate-400'}`}>Situação do Prazo:</span>
                   <span className={`inline-block mt-0.5 text-[10px] px-2.5 py-0.5 rounded-full font-black uppercase ${riskStatus.badgeBg}`}>
                     {riskStatus.icon} {riskStatus.label}
                   </span>
@@ -459,15 +459,15 @@
               </div>
 
               {item.obs && item.obs !== '-' && (
-                <div className="pt-2 border-t border-slate-700/40 text-xs">
-                  <span className="text-slate-400 font-medium block">Observações / Situação:</span>
-                  <p className="mt-0.5 text-slate-300 leading-relaxed font-normal">{item.obs}</p>
+                <div className={`pt-2 border-t text-xs ${isLightMode ? 'border-slate-300' : 'border-slate-700/40'}`}>
+                  <span className={`font-medium block ${isLightMode ? 'text-slate-700' : 'text-slate-400'}`}>Observações / Situação:</span>
+                  <p className={`mt-0.5 leading-relaxed font-normal ${isLightMode ? 'text-slate-900' : 'text-slate-300'}`}>{item.obs}</p>
                 </div>
               )}
             </div>
 
             {/* RODAPÉ E BOTÃO DE FECHAR */}
-            <div className="flex justify-end pt-2 border-t border-slate-700/40">
+            <div className={`flex justify-end pt-2 border-t ${isLightMode ? 'border-slate-300' : 'border-slate-700/40'}`}>
               <button
                 onClick={onClose}
                 className="bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs px-6 py-2.5 rounded-xl transition-all shadow-md active:scale-95"
@@ -515,7 +515,7 @@
                 </button>
                 <button
                   onClick={onClose}
-                  className={`text-xs font-bold px-3 py-2 rounded-xl transition-all ${isLightMode ? 'bg-slate-200 hover:bg-slate-300 text-slate-700' : 'bg-slate-800 hover:bg-slate-700 text-slate-300'}`}
+                  className={`text-xs font-bold px-3 py-2 rounded-xl transition-all ${isLightMode ? 'bg-slate-200 hover:bg-slate-300 text-slate-800' : 'bg-slate-800 hover:bg-slate-700 text-slate-300'}`}
                 >
                   ✕ Fechar
                 </button>
@@ -563,11 +563,11 @@
 
       return (
         <div className="relative" ref={ref}>
-          <label className={`text-xs mb-1 block font-medium ${isLightMode ? 'text-slate-600' : 'text-slate-400'}`}>{title}</label>
+          <label className={`text-xs mb-1 block font-bold ${isLightMode ? 'text-slate-800' : 'text-slate-400'}`}>{title}</label>
           <button
             type="button"
             onClick={() => setOpen(!open)}
-            className={`w-full border rounded-xl px-3 py-2 text-xs flex items-center justify-between gap-2 text-left ${isLightMode ? 'bg-white border-slate-300 text-slate-800' : 'bg-slate-950 border-slate-800 text-white'}`}
+            className={`w-full border rounded-xl px-3 py-2 text-xs flex items-center justify-between gap-2 text-left font-semibold ${isLightMode ? 'bg-white border-slate-300 text-slate-900 shadow-sm' : 'bg-slate-950 border-slate-800 text-white'}`}
           >
             <span className="truncate">
               {selectedValues.length === 0 
@@ -576,17 +576,17 @@
                   ? 'Todos selecionados' 
                   : `${selectedValues.length} selecionado(s)`}
             </span>
-            <span className="text-[10px] text-slate-400">▼</span>
+            <span className={isLightMode ? 'text-slate-700' : 'text-slate-400'}>▼</span>
           </button>
 
           {open && (
             <div className={`absolute z-50 mt-1 w-full border rounded-xl shadow-2xl p-2 max-h-56 overflow-y-auto space-y-1 ${isLightMode ? 'bg-white border-slate-300' : 'bg-slate-900 border-slate-700'}`}>
-              <div className="flex justify-between text-[10px] pb-1 border-b border-slate-700 font-semibold px-1">
-                <button type="button" onClick={() => onChange([...options])} className="text-blue-500 hover:underline">Marcar Todos</button>
-                <button type="button" onClick={() => onChange([])} className="text-rose-500 hover:underline">Desmarcar Todos</button>
+              <div className={`flex justify-between text-[10px] pb-1 border-b font-semibold px-1 ${isLightMode ? 'border-slate-200' : 'border-slate-700'}`}>
+                <button type="button" onClick={() => onChange([...options])} className="text-blue-600 hover:underline font-bold">Marcar Todos</button>
+                <button type="button" onClick={() => onChange([])} className="text-rose-600 hover:underline font-bold">Desmarcar Todos</button>
               </div>
               {options.map(opt => (
-                <label key={opt} className={`flex items-center gap-2 px-2 py-1 rounded cursor-pointer text-xs ${isLightMode ? 'hover:bg-slate-100 text-slate-800' : 'hover:bg-slate-800 text-slate-200'}`}>
+                <label key={opt} className={`flex items-center gap-2 px-2 py-1 rounded cursor-pointer text-xs ${isLightMode ? 'hover:bg-slate-100 text-slate-900 font-medium' : 'hover:bg-slate-800 text-slate-200'}`}>
                   <input
                     type="checkbox"
                     checked={selectedValues.includes(opt)}
@@ -730,7 +730,7 @@
             let empenhoVal = instrumento === 'TED' ? globalVal : (idxEmpenho !== -1 ? parseVal(row[idxEmpenho]) : 0);
             const repassadoVal = idxRepassado !== -1 ? parseVal(row[idxRepassado]) : 0;
 
-            // ELIMINA DADOS ZERADOS FANTASMA (RASCUNHOS OU LINHAS DE MODELO DA PLANILHA)
+            // ELIMINA DADOS ZERADOS FANTASMA
             if (globalVal === 0 && empenhoVal === 0 && repassadoVal === 0) {
               continue;
             }
@@ -814,7 +814,7 @@
         setFileName(sourceName);
       };
 
-      // TENTATIVA COMPATÍVEL COM URLS DO VERCEL E NORMAS DE HOSPEDAGEM WEB
+      // CARREGAMENTO INICIAL
       useEffect(() => {
         if (!isAuthenticated) return;
 
@@ -832,7 +832,6 @@
 
           for (const nome of nomesArquivos) {
             try {
-              // Converte caminhos com espaço para URL Vercel segura (%20)
               const urlEncoded = `./${encodeURIComponent(nome)}`;
               const response = await fetch(urlEncoded);
               if (response.ok) {
@@ -1029,7 +1028,7 @@
         const active = sortConfig.key === key;
         return (
           <span className={`ml-1 text-[10px] font-black inline-flex items-center px-1 rounded ${
-            active ? 'bg-sky-500 text-white shadow-sm' : 'text-slate-500 opacity-60'
+            active ? 'bg-sky-600 text-white shadow-sm' : 'text-slate-400 opacity-60'
           }`}>
             {active ? (sortConfig.direction === 'asc' ? '▲' : '▼') : '↕'}
           </span>
@@ -1074,7 +1073,7 @@
         if (item.diasParaVencer !== null) {
           if (item.diasParaVencer < 0) {
             return {
-              bg: isLightMode ? 'bg-rose-100/90 border-rose-300 text-rose-900' : 'bg-rose-950/40 border-rose-800 text-rose-200',
+              bg: isLightMode ? 'bg-rose-100/90 border-rose-300 text-slate-900' : 'bg-rose-950/40 border-rose-800 text-rose-200',
               badgeBg: 'bg-rose-600 text-white',
               label: 'Vencido',
               icon: '🚨'
@@ -1082,7 +1081,7 @@
           }
           if (item.diasParaVencer <= 30) {
             return {
-              bg: isLightMode ? 'bg-amber-100/90 border-amber-300 text-amber-900' : 'bg-amber-950/40 border-amber-800 text-amber-200',
+              bg: isLightMode ? 'bg-amber-100/90 border-amber-300 text-slate-900' : 'bg-amber-950/40 border-amber-800 text-amber-200',
               badgeBg: 'bg-amber-600 text-white',
               label: `Crítico (${item.diasParaVencer}d)`,
               icon: '⚠️'
@@ -1090,7 +1089,7 @@
           }
           if (item.diasParaVencer <= 90) {
             return {
-              bg: isLightMode ? 'bg-yellow-50/80 border-yellow-200 text-yellow-900' : 'bg-yellow-950/20 border-yellow-900/40 text-yellow-200',
+              bg: isLightMode ? 'bg-yellow-100/80 border-yellow-300 text-slate-900' : 'bg-yellow-950/20 border-yellow-900/40 text-yellow-200',
               badgeBg: 'bg-yellow-500 text-black font-bold',
               label: `Atenção (${item.diasParaVencer}d)`,
               icon: '⚡'
@@ -1098,8 +1097,8 @@
           }
         }
         return {
-          bg: isLightMode ? 'bg-emerald-50/50 border-emerald-200/60 text-slate-800' : 'bg-slate-900/40 border-slate-800/80 text-slate-200',
-          badgeBg: 'bg-emerald-600/20 text-emerald-400 border border-emerald-500/30',
+          bg: isLightMode ? 'bg-white hover:bg-slate-50 border-slate-200 text-slate-900' : 'bg-slate-900/40 border-slate-800/80 text-slate-200',
+          badgeBg: isLightMode ? 'bg-emerald-100 text-emerald-900 border border-emerald-300 font-bold' : 'bg-emerald-600/20 text-emerald-400 border border-emerald-500/30',
           label: item.diasParaVencer !== null ? `${item.diasParaVencer}d` : 'Regular',
           icon: '🟢'
         };
@@ -1152,11 +1151,14 @@
       const programasDisponiveis = useMemo(() => Array.from(new Set(data.map(d => d.codPrograma).filter(p => p && p !== '-'))).sort(), [data]);
       const parlamentaresDisponiveis = useMemo(() => Array.from(new Set(data.map(d => d.parlamentar).filter(p => p && p !== '-'))).sort(), [data]);
 
+      // CONFIGURAÇÃO DOS GRÁFICOS COM CONTRASTE APERFEIÇOADO PARA MODO CLARO
       const chartConfigs = useMemo(() => {
         if (!isAuthenticated || filteredData.length === 0) return {};
 
-        const textColor = isLightMode ? '#334155' : '#94a3b8';
-        const gridColor = isLightMode ? '#e2e8f0' : '#334155';
+        const textColor = isLightMode ? '#0f172a' : '#94a3b8';
+        const gridColor = isLightMode ? '#cbd5e1' : '#334155';
+        const centerTextColor = isLightMode ? '#475569' : '#94a3b8';
+        const centerValueColor = isLightMode ? '#0284c7' : '#38bdf8';
 
         const tooltipCallback = (context) => {
           const label = context.dataset.label || '';
@@ -1165,12 +1167,12 @@
         };
 
         const pieTooltipDesign = (dataMap) => ({
-          backgroundColor: 'rgba(15, 23, 42, 0.95)',
-          titleColor: '#38bdf8',
+          backgroundColor: isLightMode ? 'rgba(255, 255, 255, 0.98)' : 'rgba(15, 23, 42, 0.95)',
+          titleColor: isLightMode ? '#0369a1' : '#38bdf8',
           titleFont: { size: 13, weight: 'bold', family: 'sans-serif' },
-          bodyColor: '#f1f5f9',
-          bodyFont: { size: 11, family: 'sans-serif' },
-          borderColor: 'rgba(56, 189, 248, 0.3)',
+          bodyColor: isLightMode ? '#0f172a' : '#f1f5f9',
+          bodyFont: { size: 11, family: 'sans-serif', weight: '600' },
+          borderColor: isLightMode ? '#94a3b8' : 'rgba(56, 189, 248, 0.3)',
           borderWidth: 1,
           padding: 12,
           cornerRadius: 12,
@@ -1215,9 +1217,9 @@
             labels: sortedUfs, 
             datasets: [
               { label: 'Volume Global', data: sortedUfs.map(uf => ufMetricsMap[uf].global), backgroundColor: '#0284c7', borderRadius: 4 },
-              { label: 'Empenhado', data: sortedUfs.map(uf => ufMetricsMap[uf].empenho), backgroundColor: '#f59e0b', borderRadius: 4 },
-              { label: 'Repassado', data: sortedUfs.map(uf => ufMetricsMap[uf].repassado), backgroundColor: '#10b981', borderRadius: 4 },
-              { label: 'Falta Repassar', data: sortedUfs.map(uf => Math.max(0, ufMetricsMap[uf].empenho - ufMetricsMap[uf].repassado)), backgroundColor: '#f43f5e', borderRadius: 4 }
+              { label: 'Empenhado', data: sortedUfs.map(uf => ufMetricsMap[uf].empenho), backgroundColor: '#d97706', borderRadius: 4 },
+              { label: 'Repassado', data: sortedUfs.map(uf => ufMetricsMap[uf].repassado), backgroundColor: '#059669', borderRadius: 4 },
+              { label: 'Falta Repassar', data: sortedUfs.map(uf => Math.max(0, ufMetricsMap[uf].empenho - ufMetricsMap[uf].repassado)), backgroundColor: '#e11d48', borderRadius: 4 }
             ] 
           },
           options: { 
@@ -1226,12 +1228,12 @@
             clip: false,
             layout: { padding: { top: 15, left: 10, right: 10 } },
             plugins: { 
-              legend: { display: true, position: 'top', labels: { color: textColor, font: { size: 10 }, boxWidth: 12 } },
+              legend: { display: true, position: 'top', labels: { color: textColor, font: { size: 11, weight: 'bold' }, boxWidth: 12 } },
               tooltip: { callbacks: { label: tooltipCallback } }
             }, 
             scales: { 
-              x: { ticks: { color: textColor, maxRotation: 0, minRotation: 0 }, grid: { display: false } }, 
-              y: { grace: '10%', ticks: { color: textColor, callback: (val) => formatMillionsAxis(val) }, grid: { color: gridColor } } 
+              x: { ticks: { color: textColor, font: { weight: 'bold' }, maxRotation: 0, minRotation: 0 }, grid: { display: false } }, 
+              y: { grace: '10%', ticks: { color: textColor, font: { weight: 'bold' }, callback: (val) => formatMillionsAxis(val) }, grid: { color: gridColor } } 
             },
             onClick: (e, elements) => {
               if (elements.length > 0) {
@@ -1261,9 +1263,9 @@
             labels: sortedParls,
             datasets: [
               { label: 'Volume Global', data: sortedParls.map(p => parlMetricsMap[p].global), backgroundColor: '#0284c7', borderRadius: 4 },
-              { label: 'Empenhado', data: sortedParls.map(p => parlMetricsMap[p].empenho), backgroundColor: '#f59e0b', borderRadius: 4 },
-              { label: 'Repassado', data: sortedParls.map(p => parlMetricsMap[p].repassado), backgroundColor: '#10b981', borderRadius: 4 },
-              { label: 'Falta Repassar', data: sortedParls.map(p => Math.max(0, parlMetricsMap[p].empenho - parlMetricsMap[p].repassado)), backgroundColor: '#f43f5e', borderRadius: 4 }
+              { label: 'Empenhado', data: sortedParls.map(p => parlMetricsMap[p].empenho), backgroundColor: '#d97706', borderRadius: 4 },
+              { label: 'Repassado', data: sortedParls.map(p => parlMetricsMap[p].repassado), backgroundColor: '#059669', borderRadius: 4 },
+              { label: 'Falta Repassar', data: sortedParls.map(p => Math.max(0, parlMetricsMap[p].empenho - parlMetricsMap[p].repassado)), backgroundColor: '#e11d48', borderRadius: 4 }
             ]
           },
           options: {
@@ -1272,13 +1274,13 @@
             maintainAspectRatio: false,
             layout: { padding: { right: 25 } },
             plugins: {
-              legend: { display: true, position: 'top', labels: { color: textColor, font: { size: 10 }, boxWidth: 12 } },
+              legend: { display: true, position: 'top', labels: { color: textColor, font: { size: 11, weight: 'bold' }, boxWidth: 12 } },
               tooltip: { callbacks: { label: tooltipCallback } }
             },
             scales: {
               x: {
                 grace: '15%',
-                ticks: { color: textColor, callback: (val) => formatMillionsAxis(val) },
+                ticks: { color: textColor, font: { weight: 'bold' }, callback: (val) => formatMillionsAxis(val) },
                 grid: { color: gridColor }
               },
               y: {
@@ -1313,9 +1315,9 @@
             labels: sortedProgs, 
             datasets: [
               { label: 'Volume Global', data: sortedProgs.map(p => progMetricsMap[p].global), backgroundColor: '#0284c7', borderRadius: 4 },
-              { label: 'Empenhado', data: sortedProgs.map(p => progMetricsMap[p].empenho), backgroundColor: '#f59e0b', borderRadius: 4 },
-              { label: 'Repassado', data: sortedProgs.map(p => progMetricsMap[p].repassado), backgroundColor: '#10b981', borderRadius: 4 },
-              { label: 'Falta Repassar', data: sortedProgs.map(p => Math.max(0, progMetricsMap[p].empenho - progMetricsMap[p].repassado)), backgroundColor: '#f43f5e', borderRadius: 4 }
+              { label: 'Empenhado', data: sortedProgs.map(p => progMetricsMap[p].empenho), backgroundColor: '#d97706', borderRadius: 4 },
+              { label: 'Repassado', data: sortedProgs.map(p => progMetricsMap[p].repassado), backgroundColor: '#059669', borderRadius: 4 },
+              { label: 'Falta Repassar', data: sortedProgs.map(p => Math.max(0, progMetricsMap[p].empenho - progMetricsMap[p].repassado)), backgroundColor: '#e11d48', borderRadius: 4 }
             ] 
           },
           options: { 
@@ -1324,12 +1326,12 @@
             maintainAspectRatio: false, 
             layout: { padding: { right: 25 } },
             plugins: { 
-              legend: { display: true, position: 'top', labels: { color: textColor, font: { size: 10 }, boxWidth: 12 } },
+              legend: { display: true, position: 'top', labels: { color: textColor, font: { size: 11, weight: 'bold' }, boxWidth: 12 } },
               tooltip: { callbacks: { label: tooltipCallback } }
             }, 
             scales: { 
-              x: { grace: '15%', ticks: { color: textColor, callback: (val) => formatMillionsAxis(val) }, grid: { color: gridColor } }, 
-              y: { ticks: { color: textColor }, grid: { display: false } } 
+              x: { grace: '15%', ticks: { color: textColor, font: { weight: 'bold' }, callback: (val) => formatMillionsAxis(val) }, grid: { color: gridColor } }, 
+              y: { ticks: { color: textColor, font: { weight: 'bold' } }, grid: { display: false } } 
             },
             onClick: (e, elements) => {
               if (elements.length > 0) {
@@ -1363,7 +1365,7 @@
             labels: typeKeys, 
             datasets: [{ 
               data: typeKeys.map(k => typeMap[k].global), 
-              backgroundColor: ['#0284c7', '#f59e0b', '#10b981'], 
+              backgroundColor: ['#0284c7', '#d97706', '#059669'], 
               borderWidth: 0 
             }] 
           },
@@ -1372,9 +1374,11 @@
             maintainAspectRatio: false, 
             cutout: '72%',
             plugins: { 
+              centerTextColor,
+              centerValueColor,
               legend: { 
                 position: 'bottom', 
-                labels: { color: textColor, font: { size: 11 } }
+                labels: { color: textColor, font: { size: 11, weight: 'bold' } }
               },
               tooltip: pieTooltipDesign(typeMap)
             },
@@ -1405,7 +1409,7 @@
             labels: rpKeys, 
             datasets: [{ 
               data: rpKeys.map(k => rpMap[k].global), 
-              backgroundColor: ['#ec4899', '#f59e0b', '#10b981', '#06b6d4', '#8b5cf6'], 
+              backgroundColor: ['#db2777', '#d97706', '#059669', '#0891b2', '#7c3aed'], 
               borderWidth: 0 
             }] 
           },
@@ -1414,7 +1418,9 @@
             maintainAspectRatio: false, 
             cutout: '72%',
             plugins: { 
-              legend: { position: 'bottom', labels: { color: textColor, font: { size: 11 } } },
+              centerTextColor,
+              centerValueColor,
+              legend: { position: 'bottom', labels: { color: textColor, font: { size: 11, weight: 'bold' } } },
               tooltip: pieTooltipDesign(rpMap)
             },
             onClick: (e, elements) => {
@@ -1523,13 +1529,13 @@
                 Painel de Monitoramento MTur
                 {presentationMode && <span className="text-xs bg-indigo-600 text-white px-2.5 py-0.5 rounded-full font-bold uppercase animate-pulse">Modo TV / Reunião</span>}
               </h1>
-              <p className={`text-sm mt-0.5 ${isLightMode ? 'text-slate-600' : 'text-slate-400'}`}>Visão Executiva de Convênios, Termos de Fomento e TEDs</p>
+              <p className={`text-sm mt-0.5 ${isLightMode ? 'text-slate-700 font-medium' : 'text-slate-400'}`}>Visão Executiva de Convênios, Termos de Fomento e TEDs</p>
             </div>
 
             <div className="flex flex-wrap items-center gap-3 no-print">
               <button
                 onClick={() => setIsLightMode(!isLightMode)}
-                className={`px-3 py-2 rounded-xl text-xs font-bold transition-all border flex items-center gap-1.5 ${isLightMode ? 'bg-white border-slate-300 text-slate-700 hover:bg-slate-50' : 'bg-slate-900 border-slate-700 text-slate-200 hover:bg-slate-800'}`}
+                className={`px-3 py-2 rounded-xl text-xs font-bold transition-all border flex items-center gap-1.5 ${isLightMode ? 'bg-white border-slate-300 text-slate-800 hover:bg-slate-50 shadow-sm' : 'bg-slate-900 border-slate-700 text-slate-200 hover:bg-slate-800'}`}
               >
                 {isLightMode ? '🌙 Modo Escuro' : '☀️ Modo Claro'}
               </button>
@@ -1546,7 +1552,7 @@
                 className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 border ${
                   presentationMode 
                     ? 'bg-indigo-600 border-indigo-500 text-white shadow-lg' 
-                    : isLightMode ? 'bg-white border-slate-300 text-slate-700' : 'bg-slate-900 border-slate-700 text-slate-300 hover:bg-slate-800'
+                    : isLightMode ? 'bg-white border-slate-300 text-slate-800 shadow-sm' : 'bg-slate-900 border-slate-700 text-slate-300 hover:bg-slate-800'
                 }`}
               >
                 🖥️ {presentationMode ? 'Sair do Modo Apresentação' : 'Modo Apresentação (TV)'}
@@ -1578,7 +1584,7 @@
             <div className={`border-2 border-dashed rounded-3xl p-12 text-center space-y-4 ${isLightMode ? 'bg-white border-slate-300' : 'bg-slate-900/60 border-slate-800'}`}>
               <div className="text-6xl animate-bounce">📊</div>
               <h2 className="text-2xl font-bold">Nenhuma Planilha Carregada</h2>
-              <p className={`text-sm max-w-md mx-auto ${isLightMode ? 'text-slate-600' : 'text-slate-400'}`}>
+              <p className={`text-sm max-w-md mx-auto ${isLightMode ? 'text-slate-700' : 'text-slate-400'}`}>
                 Envie a planilha de dados pelo botão verde superior para alimentar o painel ou certifique-se de que o arquivo no GitHub se chama <strong>Planilha de Emendas - Resumida.xlsx</strong>.
               </p>
             </div>
@@ -1586,14 +1592,14 @@
             <>
               {/* FILTROS PRINCIPAIS */}
               {!presentationMode && (
-                <div className={`border rounded-2xl p-5 space-y-4 shadow-xl no-print ${isLightMode ? 'bg-white border-slate-200' : 'bg-slate-900 border-slate-800'}`}>
-                  <div className="flex flex-wrap items-center justify-between gap-4 border-b pb-4 border-slate-700/50">
+                <div className={`border rounded-2xl p-5 space-y-4 shadow-xl no-print ${isLightMode ? 'bg-white border-slate-300' : 'bg-slate-900 border-slate-800'}`}>
+                  <div className={`flex flex-wrap items-center justify-between gap-4 border-b pb-4 ${isLightMode ? 'border-slate-200' : 'border-slate-700/50'}`}>
                     <div className={`flex p-1 rounded-xl border ${isLightMode ? 'bg-slate-100 border-slate-300' : 'bg-slate-950 border-slate-800'}`}>
                       {['ALL', 'Convênio', 'Termo de Fomento', 'TED'].map(tab => (
                         <button
                           key={tab}
                           onClick={() => { setFilterTab(tab); setCurrentPage(1); }}
-                          className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-all ${filterTab === tab ? 'bg-blue-600 text-white shadow-lg' : (isLightMode ? 'text-slate-600 hover:text-black' : 'text-slate-400 hover:text-white')}`}
+                          className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${filterTab === tab ? 'bg-blue-600 text-white shadow-lg' : (isLightMode ? 'text-slate-700 hover:text-black font-semibold' : 'text-slate-400 hover:text-white')}`}
                         >
                           {tab === 'ALL' ? 'Todos os Instrumentos' : tab}
                         </button>
@@ -1603,7 +1609,7 @@
                     <div className="flex flex-wrap items-center gap-3">
                       <button
                         onClick={handleResetFilters}
-                        className={`px-3 py-1.5 border rounded-xl text-xs font-semibold transition-all ${isLightMode ? 'bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-300' : 'bg-slate-800 hover:bg-slate-700 text-slate-300 border-slate-700'}`}
+                        className={`px-3 py-1.5 border rounded-xl text-xs font-bold transition-all ${isLightMode ? 'bg-slate-100 hover:bg-slate-200 text-slate-800 border-slate-300' : 'bg-slate-800 hover:bg-slate-700 text-slate-300 border-slate-700'}`}
                       >
                         🔄 Resetar Filtros
                       </button>
@@ -1613,7 +1619,7 @@
                         placeholder="Buscar proponente, cidade, parlamentar, SEI..."
                         value={search}
                         onChange={(e) => { setSearch(e.target.value); setCurrentPage(1); }}
-                        className={`border rounded-xl px-4 py-1.5 text-xs focus:outline-none focus:border-blue-500 w-full sm:w-64 ${isLightMode ? 'bg-white border-slate-300 text-slate-800' : 'bg-slate-950 border-slate-800 text-white'}`}
+                        className={`border rounded-xl px-4 py-1.5 text-xs focus:outline-none focus:border-blue-500 w-full sm:w-64 font-semibold ${isLightMode ? 'bg-white border-slate-300 text-slate-900' : 'bg-slate-950 border-slate-800 text-white'}`}
                       />
                     </div>
                   </div>
@@ -1644,16 +1650,16 @@
                     />
 
                     <div>
-                      <label className={`text-xs mb-1 block font-medium ${isLightMode ? 'text-slate-600' : 'text-slate-400'}`}>Modalidade (RP)</label>
-                      <select value={filterRP} onChange={(e) => { setFilterRP(e.target.value); setCurrentPage(1); }} className={`w-full border rounded-xl px-2.5 py-2 text-xs ${isLightMode ? 'bg-white border-slate-300 text-slate-800' : 'bg-slate-950 border-slate-800 text-white'}`}>
+                      <label className={`text-xs mb-1 block font-bold ${isLightMode ? 'text-slate-800' : 'text-slate-400'}`}>Modalidade (RP)</label>
+                      <select value={filterRP} onChange={(e) => { setFilterRP(e.target.value); setCurrentPage(1); }} className={`w-full border rounded-xl px-2.5 py-2 text-xs font-semibold ${isLightMode ? 'bg-white border-slate-300 text-slate-900' : 'bg-slate-950 border-slate-800 text-white'}`}>
                         <option value="ALL">Todas as RPs</option>
                         {rpsDisponiveis.map(rp => <option key={rp} value={rp}>{rp}</option>)}
                       </select>
                     </div>
 
                     <div>
-                      <label className="text-xs font-bold text-sky-500 mb-1 block">Faixa de Valor</label>
-                      <select value={filterFaixaValor} onChange={(e) => { setFilterFaixaValor(e.target.value); setCurrentPage(1); }} className={`w-full border rounded-xl px-2.5 py-2 text-xs ${isLightMode ? 'bg-white border-sky-300 text-slate-800' : 'bg-slate-950 border-sky-800/80 text-white'}`}>
+                      <label className={`text-xs font-bold mb-1 block ${isLightMode ? 'text-sky-800' : 'text-sky-500'}`}>Faixa de Valor</label>
+                      <select value={filterFaixaValor} onChange={(e) => { setFilterFaixaValor(e.target.value); setCurrentPage(1); }} className={`w-full border rounded-xl px-2.5 py-2 text-xs font-semibold ${isLightMode ? 'bg-white border-sky-300 text-slate-900' : 'bg-slate-950 border-sky-800/80 text-white'}`}>
                         <option value="ALL">Todas as Faixas</option>
                         <option value="500K">Até R$ 500 mil</option>
                         <option value="500K_2M">R$ 500k a R$ 2 mi</option>
@@ -1662,24 +1668,24 @@
                     </div>
 
                     <div>
-                      <label className={`text-xs mb-1 block font-medium ${isLightMode ? 'text-slate-600' : 'text-slate-400'}`}>Ano Celebração</label>
-                      <select value={filterAno} onChange={(e) => { setFilterAno(e.target.value); setCurrentPage(1); }} className={`w-full border rounded-xl px-2.5 py-2 text-xs ${isLightMode ? 'bg-white border-slate-300 text-slate-800' : 'bg-slate-950 border-slate-800 text-white'}`}>
+                      <label className={`text-xs mb-1 block font-bold ${isLightMode ? 'text-slate-800' : 'text-slate-400'}`}>Ano Celebração</label>
+                      <select value={filterAno} onChange={(e) => { setFilterAno(e.target.value); setCurrentPage(1); }} className={`w-full border rounded-xl px-2.5 py-2 text-xs font-semibold ${isLightMode ? 'bg-white border-slate-300 text-slate-900' : 'bg-slate-950 border-slate-800 text-white'}`}>
                         <option value="ALL">Todos os Anos</option>
                         {anosDisponiveis.map(ano => <option key={ano} value={ano}>{ano}</option>)}
                       </select>
                     </div>
 
                     <div>
-                      <label className="text-xs font-bold text-emerald-500 mb-1 block">Ano Repasse</label>
-                      <select value={filterAnoRepasse} onChange={(e) => { setFilterAnoRepasse(e.target.value); setCurrentPage(1); }} className={`w-full border rounded-xl px-2.5 py-2 text-xs ${isLightMode ? 'bg-white border-emerald-300 text-slate-800' : 'bg-slate-950 border-emerald-800/80 text-white'}`}>
+                      <label className={`text-xs font-bold mb-1 block ${isLightMode ? 'text-emerald-800' : 'text-emerald-500'}`}>Ano Repasse</label>
+                      <select value={filterAnoRepasse} onChange={(e) => { setFilterAnoRepasse(e.target.value); setCurrentPage(1); }} className={`w-full border rounded-xl px-2.5 py-2 text-xs font-semibold ${isLightMode ? 'bg-white border-emerald-300 text-slate-900' : 'bg-slate-950 border-emerald-800/80 text-white'}`}>
                         <option value="ALL">Todos Anos Pagos</option>
                         {anosRepasseDisponiveis.map(ano => <option key={ano} value={ano}>{ano}</option>)}
                       </select>
                     </div>
 
                     <div>
-                      <label className="text-xs font-bold text-amber-500 mb-1 block">Vigência</label>
-                      <select value={filterVigenciaAlerta} onChange={(e) => { setFilterVigenciaAlerta(e.target.value); setCurrentPage(1); }} className={`w-full border rounded-xl px-2.5 py-2 text-xs ${isLightMode ? 'bg-amber-50 border-amber-300 text-slate-800' : 'bg-slate-950 border-amber-800/80 text-white'}`}>
+                      <label className={`text-xs font-bold mb-1 block ${isLightMode ? 'text-amber-800' : 'text-amber-500'}`}>Vigência</label>
+                      <select value={filterVigenciaAlerta} onChange={(e) => { setFilterVigenciaAlerta(e.target.value); setCurrentPage(1); }} className={`w-full border rounded-xl px-2.5 py-2 text-xs font-semibold ${isLightMode ? 'bg-amber-50 border-amber-300 text-slate-900' : 'bg-slate-950 border-amber-800/80 text-white'}`}>
                         <option value="ALL">Todas</option>
                         <option value="ALERTA">🚨 Ano {currentYear}</option>
                         <option value="30">⚠️ Até 30 dias</option>
@@ -1692,10 +1698,10 @@
               )}
 
               {/* TETO ORÇAMENTÁRIO */}
-              <div className={`border rounded-2xl p-4 shadow-xl print-card ${isLightMode ? 'bg-gradient-to-r from-sky-50 via-white to-indigo-50 border-sky-200' : 'bg-gradient-to-r from-sky-950/60 via-slate-900 to-indigo-950/60 border-sky-800/40'}`}>
+              <div className={`border rounded-2xl p-4 shadow-xl print-card ${isLightMode ? 'bg-gradient-to-r from-sky-50 via-white to-indigo-50 border-sky-300 text-slate-900' : 'bg-gradient-to-r from-sky-950/60 via-slate-900 to-indigo-950/60 border-sky-800/40 text-slate-100'}`}>
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                   <div>
-                    <div className="text-xs font-bold uppercase tracking-wider text-sky-500">
+                    <div className={`text-xs font-extrabold uppercase tracking-wider ${isLightMode ? 'text-sky-800' : 'text-sky-500'}`}>
                       Teto Orçamentário MTur ({anoOrcamentoBase})
                     </div>
                     <div className="text-2xl font-black mt-0.5">
@@ -1704,14 +1710,14 @@
                   </div>
 
                   <div className="w-full md:w-1/2 space-y-1">
-                    <div className="flex justify-between text-xs font-semibold">
+                    <div className="flex justify-between text-xs font-bold">
                       <span>Repassado: {fmtR$(totRepassado)}</span>
-                      <span className="text-sky-500 font-bold">{pctOrcamentoComprometido}% Comprometido</span>
+                      <span className={`font-black ${isLightMode ? 'text-sky-900' : 'text-sky-500'}`}>{pctOrcamentoComprometido}% Comprometido</span>
                     </div>
                     <div className={`w-full h-3 rounded-full overflow-hidden p-0.5 border ${isLightMode ? 'bg-slate-200 border-slate-300' : 'bg-slate-950 border-slate-800'}`}>
                       <div className="bg-gradient-to-r from-sky-500 to-indigo-500 h-full rounded-full transition-all" style={{ width: `${Math.min(pctOrcamentoComprometido, 100)}%` }}></div>
                     </div>
-                    <div className="text-right text-[11px] text-emerald-500 font-bold">
+                    <div className={`text-right text-[11px] font-black ${isLightMode ? 'text-emerald-800' : 'text-emerald-500'}`}>
                       Saldo Disponível: {fmtR$(saldoOrcamentoDisponivel)}
                     </div>
                   </div>
@@ -1720,85 +1726,85 @@
 
               {/* CARDS INDICADORES E KPIS */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3 print-card">
-                <div className={`border rounded-2xl p-3.5 shadow-lg ${isLightMode ? 'bg-white border-slate-200' : 'bg-slate-900 border-slate-800'}`}>
-                  <div className={`text-[11px] font-semibold uppercase tracking-wider ${isLightMode ? 'text-slate-500' : 'text-slate-400'}`}>Volume Global</div>
-                  <div className="text-base font-extrabold mt-1">{fmtR$(totGlobal)}</div>
-                  <div className="text-slate-400 text-[10px] mt-1">{filteredData.length} registros</div>
+                <div className={`border rounded-2xl p-3.5 shadow-lg ${isLightMode ? 'bg-white border-slate-300 text-slate-900' : 'bg-slate-900 border-slate-800'}`}>
+                  <div className={`text-[11px] font-extrabold uppercase tracking-wider ${isLightMode ? 'text-slate-700' : 'text-slate-400'}`}>Volume Global</div>
+                  <div className="text-base font-black mt-1">{fmtR$(totGlobal)}</div>
+                  <div className={`text-[10px] mt-1 font-semibold ${isLightMode ? 'text-slate-600' : 'text-slate-400'}`}>{filteredData.length} registros</div>
                 </div>
 
-                <div className={`border rounded-2xl p-3.5 shadow-lg ${isLightMode ? 'bg-white border-slate-200' : 'bg-slate-900 border-slate-800'}`}>
-                  <div className={`text-[11px] font-semibold uppercase tracking-wider ${isLightMode ? 'text-slate-500' : 'text-slate-400'}`}>Total Empenhado</div>
-                  <div className="text-base font-extrabold text-amber-500 mt-1">{fmtR$(totEmpenho)}</div>
-                  <div className="text-slate-400 text-[10px] mt-1">Empenhos válidos</div>
+                <div className={`border rounded-2xl p-3.5 shadow-lg ${isLightMode ? 'bg-white border-slate-300 text-slate-900' : 'bg-slate-900 border-slate-800'}`}>
+                  <div className={`text-[11px] font-extrabold uppercase tracking-wider ${isLightMode ? 'text-amber-800' : 'text-slate-400'}`}>Total Empenhado</div>
+                  <div className={`text-base font-black mt-1 ${isLightMode ? 'text-amber-900' : 'text-amber-500'}`}>{fmtR$(totEmpenho)}</div>
+                  <div className={`text-[10px] mt-1 font-semibold ${isLightMode ? 'text-slate-600' : 'text-slate-400'}`}>Empenhos válidos</div>
                 </div>
 
-                <div className={`border rounded-2xl p-3.5 shadow-lg ${isLightMode ? 'bg-white border-slate-200' : 'bg-slate-900 border-slate-800'}`}>
-                  <div className={`text-[11px] font-semibold uppercase tracking-wider ${isLightMode ? 'text-slate-500' : 'text-slate-400'}`}>Total Repassado</div>
-                  <div className="text-base font-extrabold text-emerald-500 mt-1">{fmtR$(totRepassado)}</div>
-                  <div className="text-slate-400 text-[10px] mt-1">Recursos pagos</div>
+                <div className={`border rounded-2xl p-3.5 shadow-lg ${isLightMode ? 'bg-white border-slate-300 text-slate-900' : 'bg-slate-900 border-slate-800'}`}>
+                  <div className={`text-[11px] font-extrabold uppercase tracking-wider ${isLightMode ? 'text-emerald-800' : 'text-slate-400'}`}>Total Repassado</div>
+                  <div className={`text-base font-black mt-1 ${isLightMode ? 'text-emerald-900' : 'text-emerald-500'}`}>{fmtR$(totRepassado)}</div>
+                  <div className={`text-[10px] mt-1 font-semibold ${isLightMode ? 'text-slate-600' : 'text-slate-400'}`}>Recursos pagos</div>
                 </div>
 
-                <div className={`border rounded-2xl p-3.5 shadow-lg ${isLightMode ? 'bg-white border-slate-200' : 'bg-slate-900 border-slate-800'}`}>
-                  <div className={`text-[11px] font-semibold uppercase tracking-wider ${isLightMode ? 'text-slate-500' : 'text-slate-400'}`}>% Execução</div>
-                  <div className="text-base font-extrabold text-indigo-500 mt-1">{pctExecucaoEmpenho}%</div>
+                <div className={`border rounded-2xl p-3.5 shadow-lg ${isLightMode ? 'bg-white border-slate-300 text-slate-900' : 'bg-slate-900 border-slate-800'}`}>
+                  <div className={`text-[11px] font-extrabold uppercase tracking-wider ${isLightMode ? 'text-indigo-800' : 'text-slate-400'}`}>% Execução</div>
+                  <div className={`text-base font-black mt-1 ${isLightMode ? 'text-indigo-900' : 'text-indigo-500'}`}>{pctExecucaoEmpenho}%</div>
                   <div className="w-full bg-slate-200 h-1.5 rounded-full mt-1.5 overflow-hidden">
-                    <div className="bg-indigo-500 h-full" style={{ width: `${Math.min(pctExecucaoEmpenho, 100)}%` }}></div>
+                    <div className="bg-indigo-600 h-full" style={{ width: `${Math.min(pctExecucaoEmpenho, 100)}%` }}></div>
                   </div>
                 </div>
 
                 <div 
                   onClick={() => { setFilterFaltaRepassar(!filterFaltaRepassar); setCurrentPage(1); }}
-                  className={`border rounded-2xl p-3.5 shadow-lg hover:shadow-xl transition-all cursor-pointer hover:scale-[1.02] ${filterFaltaRepassar ? 'ring-2 ring-rose-500' : ''} ${isLightMode ? 'bg-rose-50/50 border-rose-200 hover:bg-rose-100/60' : 'bg-rose-950/20 border-rose-900/40 hover:bg-rose-950/40'}`}
+                  className={`border rounded-2xl p-3.5 shadow-lg hover:shadow-xl transition-all cursor-pointer hover:scale-[1.02] ${filterFaltaRepassar ? 'ring-2 ring-rose-600' : ''} ${isLightMode ? 'bg-rose-50 border-rose-300 hover:bg-rose-100/80' : 'bg-rose-950/20 border-rose-900/40 hover:bg-rose-950/40'}`}
                 >
-                  <div className="text-rose-500 text-[11px] font-semibold uppercase tracking-wider flex items-center justify-between">
+                  <div className={`text-[11px] font-black uppercase tracking-wider flex items-center justify-between ${isLightMode ? 'text-rose-900' : 'text-rose-500'}`}>
                     <span>Falta Repassar</span>
                     {filterFaltaRepassar && <span className="text-[9px] bg-rose-600 text-white px-1.5 py-0.5 rounded font-black">Ativo</span>}
                   </div>
-                  <div className="text-base font-extrabold text-rose-500 mt-1">{fmtR$(totFaltaRepassar)}</div>
-                  <div className="text-slate-400 text-[10px] mt-1 flex justify-between items-center">
-                    <span>Empenhado - Pago</span>
-                    <span className="text-rose-400 font-bold text-[9px]">Filtrar 🔍</span>
+                  <div className={`text-base font-black mt-1 ${isLightMode ? 'text-rose-950' : 'text-rose-500'}`}>{fmtR$(totFaltaRepassar)}</div>
+                  <div className="text-[10px] mt-1 flex justify-between items-center font-semibold">
+                    <span className={isLightMode ? 'text-slate-700' : 'text-slate-400'}>Empenhado - Pago</span>
+                    <span className={`font-black text-[9px] ${isLightMode ? 'text-rose-900' : 'text-rose-400'}`}>Filtrar 🔍</span>
                   </div>
                 </div>
 
                 <div 
                   onClick={() => { setFilterVigenciaAlerta(filterVigenciaAlerta === 'ALERTA' ? 'ALL' : 'ALERTA'); setCurrentPage(1); }}
-                  className={`border rounded-2xl p-3.5 shadow-lg flex flex-col justify-between cursor-pointer transition-all hover:scale-[1.02] ${filterVigenciaAlerta === 'ALERTA' ? 'ring-2 ring-amber-500' : ''} ${isLightMode ? 'bg-amber-50/60 border-amber-200 hover:bg-amber-100/80' : 'bg-amber-950/20 border-amber-900/50 hover:bg-amber-950/40'}`}
+                  className={`border rounded-2xl p-3.5 shadow-lg flex flex-col justify-between cursor-pointer transition-all hover:scale-[1.02] ${filterVigenciaAlerta === 'ALERTA' ? 'ring-2 ring-amber-500' : ''} ${isLightMode ? 'bg-amber-50 border-amber-300 hover:bg-amber-100/90' : 'bg-amber-950/20 border-amber-900/50 hover:bg-amber-950/40'}`}
                 >
                   <div>
-                    <div className="text-amber-500 text-[11px] font-bold uppercase tracking-wider flex items-center justify-between">
+                    <div className={`text-[11px] font-black uppercase tracking-wider flex items-center justify-between ${isLightMode ? 'text-amber-900' : 'text-amber-500'}`}>
                       <span>Vigências {currentYear}</span>
                       {filterVigenciaAlerta === 'ALERTA' && <span className="text-[9px] bg-amber-500 text-black px-1.5 py-0.5 rounded font-black">Ativo</span>}
                     </div>
                     <div className="flex items-baseline gap-1.5 mt-0.5">
-                      <span className="text-base font-extrabold text-amber-500">{totalAlertasVigencia}</span>
-                      <span className="text-[10px] text-slate-400 font-medium">no ano</span>
+                      <span className={`text-base font-black ${isLightMode ? 'text-amber-950' : 'text-amber-500'}`}>{totalAlertasVigencia}</span>
+                      <span className={`text-[10px] font-bold ${isLightMode ? 'text-slate-700' : 'text-slate-400'}`}>no ano</span>
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-3 gap-1 mt-2 pt-1.5 border-t border-amber-500/20" onClick={(e) => e.stopPropagation()}>
+                  <div className={`grid grid-cols-3 gap-1 mt-2 pt-1.5 border-t ${isLightMode ? 'border-amber-300' : 'border-amber-500/20'}`} onClick={(e) => e.stopPropagation()}>
                     <button
                       onClick={() => { setFilterVigenciaAlerta(filterVigenciaAlerta === '30' ? 'ALL' : '30'); setCurrentPage(1); }}
-                      className={`border rounded-lg p-0.5 text-center transition-all ${filterVigenciaAlerta === '30' ? 'bg-rose-600 text-white border-rose-500' : 'bg-rose-950/20 border-rose-500/30'}`}
+                      className={`border rounded-lg p-0.5 text-center transition-all ${filterVigenciaAlerta === '30' ? 'bg-rose-600 text-white border-rose-500' : (isLightMode ? 'bg-rose-100 border-rose-300' : 'bg-rose-950/20 border-rose-500/30')}`}
                     >
-                      <span className="block text-[8px] font-extrabold text-rose-400">30d</span>
-                      <span className="text-[10px] font-extrabold text-rose-300">{vencendo30}</span>
+                      <span className={`block text-[8px] font-extrabold ${isLightMode && filterVigenciaAlerta !== '30' ? 'text-rose-900' : 'text-rose-400'}`}>30d</span>
+                      <span className={`text-[10px] font-extrabold ${isLightMode && filterVigenciaAlerta !== '30' ? 'text-rose-950' : 'text-rose-300'}`}>{vencendo30}</span>
                     </button>
 
                     <button
                       onClick={() => { setFilterVigenciaAlerta(filterVigenciaAlerta === '60' ? 'ALL' : '60'); setCurrentPage(1); }}
-                      className={`border rounded-lg p-0.5 text-center transition-all ${filterVigenciaAlerta === '60' ? 'bg-amber-600 text-white border-amber-500' : 'bg-amber-950/20 border-amber-500/30'}`}
+                      className={`border rounded-lg p-0.5 text-center transition-all ${filterVigenciaAlerta === '60' ? 'bg-amber-600 text-white border-amber-500' : (isLightMode ? 'bg-amber-100 border-amber-300' : 'bg-amber-950/20 border-amber-500/30')}`}
                     >
-                      <span className="block text-[8px] font-extrabold text-amber-400">60d</span>
-                      <span className="text-[10px] font-extrabold text-amber-300">{vencendo60}</span>
+                      <span className={`block text-[8px] font-extrabold ${isLightMode && filterVigenciaAlerta !== '60' ? 'text-amber-900' : 'text-amber-400'}`}>60d</span>
+                      <span className={`text-[10px] font-extrabold ${isLightMode && filterVigenciaAlerta !== '60' ? 'text-amber-950' : 'text-amber-300'}`}>{vencendo60}</span>
                     </button>
 
                     <button
                       onClick={() => { setFilterVigenciaAlerta(filterVigenciaAlerta === '90' ? 'ALL' : '90'); setCurrentPage(1); }}
-                      className={`border rounded-lg p-0.5 text-center transition-all ${filterVigenciaAlerta === '90' ? 'bg-sky-600 text-white border-sky-500' : 'bg-sky-950/20 border-sky-500/30'}`}
+                      className={`border rounded-lg p-0.5 text-center transition-all ${filterVigenciaAlerta === '90' ? 'bg-sky-600 text-white border-sky-500' : (isLightMode ? 'bg-sky-100 border-sky-300' : 'bg-sky-950/20 border-sky-500/30')}`}
                     >
-                      <span className="block text-[8px] font-extrabold text-sky-400">90d</span>
-                      <span className="text-[10px] font-extrabold text-sky-300">{vencendo90}</span>
+                      <span className={`block text-[8px] font-extrabold ${isLightMode && filterVigenciaAlerta !== '90' ? 'text-sky-900' : 'text-sky-400'}`}>90d</span>
+                      <span className={`text-[10px] font-extrabold ${isLightMode && filterVigenciaAlerta !== '90' ? 'text-sky-950' : 'text-sky-300'}`}>{vencendo90}</span>
                     </button>
                   </div>
                 </div>
@@ -1808,36 +1814,36 @@
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 
                 {/* MAPA BRASIL */}
-                <div className={`border rounded-2xl p-5 shadow-lg flex flex-col justify-between print-card ${isLightMode ? 'bg-white border-slate-200' : 'bg-slate-900 border-slate-800'}`}>
+                <div className={`border rounded-2xl p-5 shadow-lg flex flex-col justify-between print-card ${isLightMode ? 'bg-white border-slate-300' : 'bg-slate-900 border-slate-800'}`}>
                   <div className="flex items-center justify-between mb-2">
-                    <h3 className={`text-xs font-bold uppercase tracking-wider ${isLightMode ? 'text-slate-700' : 'text-slate-300'}`}>Mapa de Distribuição (UF)</h3>
+                    <h3 className={`text-xs font-black uppercase tracking-wider ${isLightMode ? 'text-slate-900' : 'text-slate-300'}`}>Mapa de Distribuição (UF)</h3>
                     <div className="flex items-center gap-2 no-print">
                       {selectedUFs.length > 0 && (
-                        <button onClick={() => setSelectedUFs([])} className="text-[10px] text-rose-400 hover:underline font-bold mr-1">Limpar Seleção</button>
+                        <button onClick={() => setSelectedUFs([])} className="text-[10px] text-rose-600 hover:underline font-bold mr-1">Limpar Seleção</button>
                       )}
                       <button
                         onClick={() => setExpandedItem({ isMap: true, title: "Mapa de Distribuição por UF", mapProps: { selectedUFs, onToggleUF: handleToggleUFMap, ufData: ufDataMap } })}
-                        className={`text-[10px] px-2 py-1 rounded-lg transition-all font-semibold ${isLightMode ? 'bg-slate-100 text-blue-600 hover:bg-slate-200' : 'bg-slate-800 text-blue-400 hover:bg-slate-700'}`}
+                        className={`text-[10px] px-2 py-1 rounded-lg transition-all font-bold ${isLightMode ? 'bg-slate-100 text-blue-800 hover:bg-slate-200 border border-slate-300' : 'bg-slate-800 text-blue-400 hover:bg-slate-700'}`}
                       >
                         🔍 Expandir / Imprimir
                       </button>
                     </div>
                   </div>
                   <BrazilMapSVG selectedUFs={selectedUFs} onToggleUF={handleToggleUFMap} ufData={ufDataMap} isLightMode={isLightMode} />
-                  <p className="text-[11px] text-slate-400 text-center mt-3 no-print">Clique em qualquer estado para filtrar a lista.</p>
+                  <p className={`text-[11px] text-center mt-3 font-semibold no-print ${isLightMode ? 'text-slate-600' : 'text-slate-400'}`}>Clique em qualquer estado para filtrar a lista.</p>
                 </div>
 
                 {/* PAINEL DE GRÁFICOS LADO A LADO */}
                 <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
                   
                   {/* LINHA 1: VOLUME POR ESTADO SOZINHO NA PRIMEIRA LINHA */}
-                  <div className={`border rounded-2xl p-4 shadow-lg flex flex-col justify-between print-card sm:col-span-2 ${isLightMode ? 'bg-white border-slate-200' : 'bg-slate-900 border-slate-800'}`}>
+                  <div className={`border rounded-2xl p-4 shadow-lg flex flex-col justify-between print-card sm:col-span-2 ${isLightMode ? 'bg-white border-slate-300' : 'bg-slate-900 border-slate-800'}`}>
                     <div className="flex items-center justify-between mb-2">
-                      <h3 className={`text-xs font-bold uppercase tracking-wider ${isLightMode ? 'text-slate-700' : 'text-slate-300'}`}>Volume por Estado (Top 10)</h3>
+                      <h3 className={`text-xs font-black uppercase tracking-wider ${isLightMode ? 'text-slate-900' : 'text-slate-300'}`}>Volume por Estado (Top 10)</h3>
                       {chartConfigs.uf && (
                         <button
                           onClick={() => setExpandedItem({ isMap: false, title: chartConfigs.uf.title, chartConfig: chartConfigs.uf.config })}
-                          className={`text-[10px] px-2 py-1 rounded-lg transition-all font-semibold no-print ${isLightMode ? 'bg-slate-100 text-blue-600 hover:bg-slate-200' : 'bg-slate-800 text-blue-400 hover:bg-slate-700'}`}
+                          className={`text-[10px] px-2 py-1 rounded-lg transition-all font-bold no-print ${isLightMode ? 'bg-slate-100 text-blue-800 hover:bg-slate-200 border border-slate-300' : 'bg-slate-800 text-blue-400 hover:bg-slate-700'}`}
                         >
                           🔍 Expandir / Imprimir
                         </button>
@@ -1847,13 +1853,13 @@
                   </div>
 
                   {/* LINHA 2: TOP 5 PROGRAMAS E TOP 5 PARLAMENTARES LADO A LADO */}
-                  <div className={`border rounded-2xl p-4 shadow-lg flex flex-col justify-between print-card ${isLightMode ? 'bg-white border-slate-200' : 'bg-slate-900 border-slate-800'}`}>
+                  <div className={`border rounded-2xl p-4 shadow-lg flex flex-col justify-between print-card ${isLightMode ? 'bg-white border-slate-300' : 'bg-slate-900 border-slate-800'}`}>
                     <div className="flex items-center justify-between mb-2">
-                      <h3 className={`text-xs font-bold uppercase tracking-wider ${isLightMode ? 'text-slate-700' : 'text-slate-300'}`}>Top 5 Programas</h3>
+                      <h3 className={`text-xs font-black uppercase tracking-wider ${isLightMode ? 'text-slate-900' : 'text-slate-300'}`}>Top 5 Programas</h3>
                       {chartConfigs.program && (
                         <button
                           onClick={() => setExpandedItem({ isMap: false, title: chartConfigs.program.title, chartConfig: chartConfigs.program.config })}
-                          className={`text-[10px] px-2 py-1 rounded-lg transition-all font-semibold no-print ${isLightMode ? 'bg-slate-100 text-blue-600 hover:bg-slate-200' : 'bg-slate-800 text-blue-400 hover:bg-slate-700'}`}
+                          className={`text-[10px] px-2 py-1 rounded-lg transition-all font-bold no-print ${isLightMode ? 'bg-slate-100 text-blue-800 hover:bg-slate-200 border border-slate-300' : 'bg-slate-800 text-blue-400 hover:bg-slate-700'}`}
                         >
                           🔍 Expandir / Imprimir
                         </button>
@@ -1862,13 +1868,13 @@
                     <div className="h-48 relative"><canvas ref={chartProgramRef}></canvas></div>
                   </div>
 
-                  <div className={`border rounded-2xl p-4 shadow-lg flex flex-col justify-between print-card ${isLightMode ? 'bg-white border-slate-200' : 'bg-slate-900 border-slate-800'}`}>
+                  <div className={`border rounded-2xl p-4 shadow-lg flex flex-col justify-between print-card ${isLightMode ? 'bg-white border-slate-300' : 'bg-slate-900 border-slate-800'}`}>
                     <div className="flex items-center justify-between mb-2">
-                      <h3 className={`text-xs font-bold uppercase tracking-wider ${isLightMode ? 'text-slate-700' : 'text-slate-300'}`}>Top 5 Parlamentares</h3>
+                      <h3 className={`text-xs font-black uppercase tracking-wider ${isLightMode ? 'text-slate-900' : 'text-slate-300'}`}>Top 5 Parlamentares</h3>
                       {chartConfigs.parlamentar && (
                         <button
                           onClick={() => setExpandedItem({ isMap: false, title: chartConfigs.parlamentar.title, chartConfig: chartConfigs.parlamentar.config })}
-                          className={`text-[10px] px-2 py-1 rounded-lg transition-all font-semibold no-print ${isLightMode ? 'bg-slate-100 text-blue-600 hover:bg-slate-200' : 'bg-slate-800 text-blue-400 hover:bg-slate-700'}`}
+                          className={`text-[10px] px-2 py-1 rounded-lg transition-all font-bold no-print ${isLightMode ? 'bg-slate-100 text-blue-800 hover:bg-slate-200 border border-slate-300' : 'bg-slate-800 text-blue-400 hover:bg-slate-700'}`}
                         >
                           🔍 Expandir / Imprimir
                         </button>
@@ -1878,13 +1884,13 @@
                   </div>
 
                   {/* LINHA 3: OS DOIS GRÁFICOS DE PIZZA/ROSCA LADO A LADO NA PARTE INFERIOR */}
-                  <div className={`border rounded-2xl p-4 shadow-lg flex flex-col justify-between print-card ${isLightMode ? 'bg-white border-slate-200' : 'bg-slate-900 border-slate-800'}`}>
+                  <div className={`border rounded-2xl p-4 shadow-lg flex flex-col justify-between print-card ${isLightMode ? 'bg-white border-slate-300' : 'bg-slate-900 border-slate-800'}`}>
                     <div className="flex items-center justify-between mb-2">
-                      <h3 className={`text-xs font-bold uppercase tracking-wider ${isLightMode ? 'text-slate-700' : 'text-slate-300'}`}>Por Tipo de Instrumento</h3>
+                      <h3 className={`text-xs font-black uppercase tracking-wider ${isLightMode ? 'text-slate-900' : 'text-slate-300'}`}>Por Tipo de Instrumento</h3>
                       {chartConfigs.type && (
                         <button
                           onClick={() => setExpandedItem({ isMap: false, title: chartConfigs.type.title, chartConfig: chartConfigs.type.config })}
-                          className={`text-[10px] px-2 py-1 rounded-lg transition-all font-semibold no-print ${isLightMode ? 'bg-slate-100 text-blue-600 hover:bg-slate-200' : 'bg-slate-800 text-blue-400 hover:bg-slate-700'}`}
+                          className={`text-[10px] px-2 py-1 rounded-lg transition-all font-bold no-print ${isLightMode ? 'bg-slate-100 text-blue-800 hover:bg-slate-200 border border-slate-300' : 'bg-slate-800 text-blue-400 hover:bg-slate-700'}`}
                         >
                           🔍 Expandir / Imprimir
                         </button>
@@ -1895,13 +1901,13 @@
                     </div>
                   </div>
 
-                  <div className={`border rounded-2xl p-4 shadow-lg flex flex-col justify-between print-card ${isLightMode ? 'bg-white border-slate-200' : 'bg-slate-900 border-slate-800'}`}>
+                  <div className={`border rounded-2xl p-4 shadow-lg flex flex-col justify-between print-card ${isLightMode ? 'bg-white border-slate-300' : 'bg-slate-900 border-slate-800'}`}>
                     <div className="flex items-center justify-between mb-2">
-                      <h3 className={`text-xs font-bold uppercase tracking-wider ${isLightMode ? 'text-slate-700' : 'text-slate-300'}`}>Por Modalidade (RP)</h3>
+                      <h3 className={`text-xs font-black uppercase tracking-wider ${isLightMode ? 'text-slate-900' : 'text-slate-300'}`}>Por Modalidade (RP)</h3>
                       {chartConfigs.rp && (
                         <button
                           onClick={() => setExpandedItem({ isMap: false, title: chartConfigs.rp.title, chartConfig: chartConfigs.rp.config })}
-                          className={`text-[10px] px-2 py-1 rounded-lg transition-all font-semibold no-print ${isLightMode ? 'bg-slate-100 text-blue-600 hover:bg-slate-200' : 'bg-slate-800 text-blue-400 hover:bg-slate-700'}`}
+                          className={`text-[10px] px-2 py-1 rounded-lg transition-all font-bold no-print ${isLightMode ? 'bg-slate-100 text-blue-800 hover:bg-slate-200 border border-slate-300' : 'bg-slate-800 text-blue-400 hover:bg-slate-700'}`}
                         >
                           🔍 Expandir / Imprimir
                         </button>
@@ -1915,19 +1921,19 @@
                 </div>
               </div>
 
-              {/* TABELA DE DADOS */}
-              <div className={`border rounded-2xl overflow-hidden shadow-xl print-card print-page-break-before ${isLightMode ? 'bg-white border-slate-200' : 'bg-slate-900 border-slate-800'}`}>
-                <div className={`p-4 border-b flex flex-col sm:flex-row justify-between items-center gap-3 ${isLightMode ? 'border-slate-200' : 'border-slate-800'}`}>
-                  <h3 className={`text-xs font-bold uppercase tracking-wider flex items-center gap-2 ${isLightMode ? 'text-slate-700' : 'text-slate-300'}`}>
+              {/* TABELA DE DADOS COM CORES DE ALTO CONTRASTE NO MODO CLARO */}
+              <div className={`border rounded-2xl overflow-hidden shadow-xl print-card print-page-break-before ${isLightMode ? 'bg-white border-slate-300' : 'bg-slate-900 border-slate-800'}`}>
+                <div className={`p-4 border-b flex flex-col sm:flex-row justify-between items-center gap-3 ${isLightMode ? 'border-slate-300 bg-slate-50' : 'border-slate-800'}`}>
+                  <h3 className={`text-xs font-black uppercase tracking-wider flex items-center gap-2 ${isLightMode ? 'text-slate-900' : 'text-slate-300'}`}>
                     <span>Detalhamento dos Instrumentos ({sortedData.length})</span>
                     {filterFaltaRepassar && (
-                      <span className="bg-rose-500/20 text-rose-500 border border-rose-500/30 text-[10px] px-2 py-0.5 rounded-full font-bold">
+                      <span className="bg-rose-600 text-white text-[10px] px-2 py-0.5 rounded-full font-extrabold shadow-sm">
                         Pendentes de Repasse
                       </span>
                     )}
                   </h3>
 
-                  <div className="flex items-center gap-3 text-xs text-slate-400 no-print">
+                  <div className="flex items-center gap-3 text-xs no-print">
                     <button
                       onClick={handleExportExcel}
                       className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-3 py-1.5 rounded-xl transition-all shadow-md flex items-center gap-1.5"
@@ -1935,12 +1941,12 @@
                       📥 Exportar Excel
                     </button>
 
-                    <div className="flex items-center gap-1.5">
+                    <div className={`flex items-center gap-1.5 font-bold ${isLightMode ? 'text-slate-700' : 'text-slate-400'}`}>
                       <span>Exibir:</span>
                       <select
                         value={itemsPerPage}
                         onChange={(e) => { setItemsPerPage(Number(e.target.value)); setCurrentPage(1); }}
-                        className={`border rounded-lg px-2 py-1 ${isLightMode ? 'bg-white border-slate-300 text-slate-800' : 'bg-slate-950 border-slate-800 text-white'}`}
+                        className={`border rounded-lg px-2 py-1 font-bold ${isLightMode ? 'bg-white border-slate-300 text-slate-900' : 'bg-slate-950 border-slate-800 text-white'}`}
                       >
                         <option value={10}>10</option>
                         <option value={25}>25</option>
@@ -1954,42 +1960,42 @@
 
                 <div className="overflow-x-auto">
                   <table className="w-full text-left text-xs">
-                    <thead className={`uppercase tracking-wider border-b select-none ${isLightMode ? 'bg-slate-100 text-slate-600 border-slate-200' : 'bg-slate-950 text-slate-400 border-slate-800'}`}>
+                    <thead className={`uppercase tracking-wider border-b select-none font-black ${isLightMode ? 'bg-slate-200 text-slate-900 border-slate-300' : 'bg-slate-950 text-slate-400 border-slate-800'}`}>
                       <tr>
-                        <th onClick={() => handleSort('ano')} className="p-3 text-center cursor-pointer hover:text-blue-500 whitespace-nowrap">
+                        <th onClick={() => handleSort('ano')} className="p-3 text-center cursor-pointer hover:text-blue-600 whitespace-nowrap">
                           Ano {renderSortIndicator('ano')}
                         </th>
-                        <th onClick={() => handleSort('proponente')} className="p-3 cursor-pointer hover:text-blue-500 whitespace-nowrap">
+                        <th onClick={() => handleSort('proponente')} className="p-3 cursor-pointer hover:text-blue-600 whitespace-nowrap">
                           Proponente / Instrumento {renderSortIndicator('proponente')}
                         </th>
-                        <th onClick={() => handleSort('numProposta')} className="p-3 text-center cursor-pointer hover:text-blue-500 whitespace-nowrap">
+                        <th onClick={() => handleSort('numProposta')} className="p-3 text-center cursor-pointer hover:text-blue-600 whitespace-nowrap">
                           Nº Proposta {renderSortIndicator('numProposta')}
                         </th>
-                        <th onClick={() => handleSort('numSEI')} className="p-3 text-center cursor-pointer hover:text-blue-500 whitespace-nowrap">
+                        <th onClick={() => handleSort('numSEI')} className="p-3 text-center cursor-pointer hover:text-blue-600 whitespace-nowrap">
                           Nº SEI {renderSortIndicator('numSEI')}
                         </th>
-                        <th onClick={() => handleSort('parlamentar')} className="p-3 text-center cursor-pointer hover:text-blue-500 whitespace-nowrap">
+                        <th onClick={() => handleSort('parlamentar')} className="p-3 text-center cursor-pointer hover:text-blue-600 whitespace-nowrap">
                           Parlamentar {renderSortIndicator('parlamentar')}
                         </th>
-                        <th onClick={() => handleSort('uf')} className="p-3 text-center cursor-pointer hover:text-blue-500 whitespace-nowrap">
+                        <th onClick={() => handleSort('uf')} className="p-3 text-center cursor-pointer hover:text-blue-600 whitespace-nowrap">
                           UF {renderSortIndicator('uf')}
                         </th>
-                        <th onClick={() => handleSort('cidadeSede')} className="p-3 text-center cursor-pointer hover:text-blue-500 whitespace-nowrap">
+                        <th onClick={() => handleSort('cidadeSede')} className="p-3 text-center cursor-pointer hover:text-blue-600 whitespace-nowrap">
                           Cidade Sede {renderSortIndicator('cidadeSede')}
                         </th>
-                        <th onClick={() => handleSort('inicioVigencia')} className="p-3 text-center cursor-pointer hover:text-blue-500 print-hide-col whitespace-nowrap">
+                        <th onClick={() => handleSort('inicioVigencia')} className="p-3 text-center cursor-pointer hover:text-blue-600 print-hide-col whitespace-nowrap">
                           Início Vig. {renderSortIndicator('inicioVigencia')}
                         </th>
-                        <th onClick={() => handleSort('fimVigencia')} className="p-3 text-center cursor-pointer hover:text-blue-500 whitespace-nowrap">
+                        <th onClick={() => handleSort('fimVigencia')} className="p-3 text-center cursor-pointer hover:text-blue-600 whitespace-nowrap">
                           Fim Vig. / Risco {renderSortIndicator('fimVigencia')}
                         </th>
-                        <th onClick={() => handleSort('global')} className="p-3 text-right cursor-pointer hover:text-blue-500 whitespace-nowrap">
+                        <th onClick={() => handleSort('global')} className="p-3 text-right cursor-pointer hover:text-blue-600 whitespace-nowrap">
                           Valor Global {renderSortIndicator('global')}
                         </th>
-                        <th onClick={() => handleSort('empenho')} className="p-3 text-right cursor-pointer hover:text-blue-500 whitespace-nowrap">
+                        <th onClick={() => handleSort('empenho')} className="p-3 text-right cursor-pointer hover:text-blue-600 whitespace-nowrap">
                           Empenhado {renderSortIndicator('empenho')}
                         </th>
-                        <th onClick={() => handleSort('repassado')} className="p-3 text-right cursor-pointer hover:text-blue-500 whitespace-nowrap">
+                        <th onClick={() => handleSort('repassado')} className="p-3 text-right cursor-pointer hover:text-blue-600 whitespace-nowrap">
                           Repassado {renderSortIndicator('repassado')}
                         </th>
                         <th className="p-3 whitespace-nowrap">Observação / Situação</th>
@@ -2003,52 +2009,56 @@
                             key={item.id} 
                             onClick={() => setSelectedInstrument(item)}
                             title="Clique para abrir a Ficha Executiva deste instrumento"
-                            className={`transition-all border-l-4 cursor-pointer hover:brightness-125 ${
-                              isLightMode ? 'hover:bg-slate-100/80' : 'hover:bg-slate-800/60'
+                            className={`transition-all border-l-4 cursor-pointer hover:brightness-105 ${
+                              isLightMode ? 'hover:bg-slate-100' : 'hover:bg-slate-800/60'
                             } ${risk.bg}`}
                           >
-                            <td className="p-3 text-center font-bold text-slate-400">
+                            <td className={`p-3 text-center font-bold ${isLightMode ? 'text-slate-800' : 'text-slate-400'}`}>
                               {item.ano}
                               {item.anoRepasse && item.anoRepasse !== '-' && (
-                                <span className="block text-[9px] text-emerald-400 font-normal">P: {item.anoRepasse}</span>
+                                <span className={`block text-[9px] font-bold ${isLightMode ? 'text-emerald-800' : 'text-emerald-400'}`}>P: {item.anoRepasse}</span>
                               )}
                             </td>
-                            <td className="p-3 font-semibold">
-                              <span className="text-sky-400 hover:underline flex items-center gap-1.5">
+                            <td className="p-3 font-extrabold">
+                              <span className={`hover:underline flex items-center gap-1.5 ${isLightMode ? 'text-blue-900' : 'text-sky-400'}`}>
                                 <span>🔍</span> {item.proponente}
                               </span>
-                              <div className="text-[10px] text-blue-500 font-bold uppercase mt-0.5">
+                              <div className={`text-[10px] font-black uppercase mt-0.5 ${isLightMode ? 'text-blue-800' : 'text-blue-500'}`}>
                                 {item.codInst}
-                                {item.rp && <span className="text-emerald-500 ml-1">• {item.rp}</span>}
-                                {item.codPrograma && <span className="text-purple-500 ml-1">• {item.codPrograma}</span>}
+                                {item.rp && <span className={isLightMode ? 'text-emerald-800 ml-1 font-black' : 'text-emerald-500 ml-1'}>• {item.rp}</span>}
+                                {item.codPrograma && <span className={isLightMode ? 'text-purple-900 ml-1 font-black' : 'text-purple-500 ml-1'}>• {item.codPrograma}</span>}
                               </div>
                             </td>
-                            <td className="p-3 text-center font-mono font-bold text-amber-400 whitespace-nowrap">
+                            <td className={`p-3 text-center font-mono font-black whitespace-nowrap ${isLightMode ? 'text-amber-900' : 'text-amber-400'}`}>
                               {item.numProposta}
                             </td>
-                            <td className="p-3 text-center font-mono text-cyan-400 font-medium whitespace-nowrap">
+                            <td className={`p-3 text-center font-mono font-bold whitespace-nowrap ${isLightMode ? 'text-cyan-900' : 'text-cyan-400'}`}>
                               {item.numSEI}
                             </td>
-                            <td className="p-3 text-center font-medium text-amber-400 whitespace-nowrap">{item.parlamentar}</td>
-                            <td className="p-3 text-center font-bold">{item.uf}</td>
-                            <td className="p-3 text-center font-semibold text-sky-300 whitespace-nowrap">{item.cidadeSede}</td>
-                            <td className="p-3 text-center whitespace-nowrap print-hide-col">{item.inicioVigencia}</td>
+                            <td className={`p-3 text-center font-extrabold whitespace-nowrap ${isLightMode ? 'text-amber-900' : 'text-amber-400'}`}>{item.parlamentar}</td>
+                            <td className={`p-3 text-center font-black ${isLightMode ? 'text-slate-900' : 'text-white'}`}>{item.uf}</td>
+                            <td className={`p-3 text-center font-bold whitespace-nowrap ${isLightMode ? 'text-sky-900' : 'text-sky-300'}`}>{item.cidadeSede}</td>
+                            <td className={`p-3 text-center whitespace-nowrap print-hide-col font-bold ${isLightMode ? 'text-slate-800' : 'text-slate-200'}`}>{item.inicioVigencia}</td>
                             <td className="p-3 text-center whitespace-nowrap">
-                              <div className="font-bold">{item.fimVigencia}</div>
+                              <div className={`font-black ${isLightMode ? 'text-slate-900' : 'text-white'}`}>{item.fimVigencia}</div>
                               <div className="mt-0.5">
                                 <span className={`text-[9px] px-2 py-0.5 rounded-full font-black uppercase ${risk.badgeBg}`}>
                                   {risk.icon} {risk.label}
                                 </span>
                               </div>
                             </td>
-                            <td className="p-3 text-right font-medium whitespace-nowrap">{fmtR$(item.global)}</td>
-                            <td className="p-3 text-right text-amber-500 font-medium whitespace-nowrap">
-                              {item.instrumento === 'TED' ? <span className="text-blue-500 text-[10px] font-bold">N/A (TED)</span> : fmtR$(item.empenho)}
+                            <td className={`p-3 text-right font-extrabold whitespace-nowrap ${isLightMode ? 'text-slate-900' : 'text-white'}`}>{fmtR$(item.global)}</td>
+                            <td className={`p-3 text-right font-extrabold whitespace-nowrap ${isLightMode ? 'text-amber-900' : 'text-amber-500'}`}>
+                              {item.instrumento === 'TED' ? <span className={`text-[10px] font-black ${isLightMode ? 'text-blue-900' : 'text-blue-500'}`}>N/A (TED)</span> : fmtR$(item.empenho)}
                             </td>
-                            <td className={`p-3 text-right font-bold whitespace-nowrap ${item.repassado > 0 ? 'text-emerald-500' : 'text-rose-500'}`}>
+                            <td className={`p-3 text-right font-black whitespace-nowrap ${
+                              item.repassado > 0 
+                                ? (isLightMode ? 'text-emerald-800' : 'text-emerald-500') 
+                                : (isLightMode ? 'text-rose-800' : 'text-rose-500')
+                            }`}>
                               {fmtR$(item.repassado)}
                             </td>
-                            <td className="p-3 whitespace-normal break-words min-w-[200px] max-w-xs text-slate-300">{item.obs}</td>
+                            <td className={`p-3 whitespace-normal break-words min-w-[200px] max-w-xs font-semibold ${isLightMode ? 'text-slate-800' : 'text-slate-300'}`}>{item.obs}</td>
                           </tr>
                         );
                       })}
@@ -2057,37 +2067,37 @@
                 </div>
 
                 {/* PAGINAÇÃO */}
-                <div className={`p-4 border-t flex flex-col sm:flex-row items-center justify-between gap-4 no-print ${isLightMode ? 'border-slate-200' : 'border-slate-800'}`}>
-                  <div className="text-xs text-slate-400">
-                    Página <span className="font-bold text-blue-500">{currentPage}</span> de <span className="font-bold text-blue-500">{totalPages}</span>
+                <div className={`p-4 border-t flex flex-col sm:flex-row items-center justify-between gap-4 no-print ${isLightMode ? 'border-slate-300 bg-slate-50' : 'border-slate-800'}`}>
+                  <div className={`text-xs font-bold ${isLightMode ? 'text-slate-700' : 'text-slate-400'}`}>
+                    Página <span className={`font-black ${isLightMode ? 'text-blue-900' : 'text-blue-500'}`}>{currentPage}</span> de <span className={`font-black ${isLightMode ? 'text-blue-900' : 'text-blue-500'}`}>{totalPages}</span>
                   </div>
 
                   <div className="flex items-center gap-2">
                     <button
                       disabled={currentPage === 1}
                       onClick={() => setCurrentPage(1)}
-                      className={`px-2.5 py-1 text-xs rounded-lg disabled:opacity-40 ${isLightMode ? 'bg-slate-200 text-slate-700 hover:bg-slate-300' : 'bg-slate-800 text-slate-200 hover:bg-slate-700'}`}
+                      className={`px-2.5 py-1 text-xs font-bold rounded-lg disabled:opacity-40 ${isLightMode ? 'bg-slate-200 text-slate-800 hover:bg-slate-300 border border-slate-300' : 'bg-slate-800 text-slate-200 hover:bg-slate-700'}`}
                     >
                       « Primeiros
                     </button>
                     <button
                       disabled={currentPage === 1}
                       onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-                      className={`px-3 py-1 text-xs rounded-lg disabled:opacity-40 ${isLightMode ? 'bg-slate-200 text-slate-700 hover:bg-slate-300' : 'bg-slate-800 text-slate-700 hover:bg-slate-700'}`}
+                      className={`px-3 py-1 text-xs font-bold rounded-lg disabled:opacity-40 ${isLightMode ? 'bg-slate-200 text-slate-800 hover:bg-slate-300 border border-slate-300' : 'bg-slate-800 text-slate-200 hover:bg-slate-700'}`}
                     >
                       ‹ Anterior
                     </button>
                     <button
                       disabled={currentPage === totalPages}
                       onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-                      className={`px-3 py-1 text-xs rounded-lg disabled:opacity-40 ${isLightMode ? 'bg-slate-200 text-slate-700 hover:bg-slate-300' : 'bg-slate-800 text-slate-200 hover:bg-slate-700'}`}
+                      className={`px-3 py-1 text-xs font-bold rounded-lg disabled:opacity-40 ${isLightMode ? 'bg-slate-200 text-slate-800 hover:bg-slate-300 border border-slate-300' : 'bg-slate-800 text-slate-200 hover:bg-slate-700'}`}
                     >
                       Próxima ›
                     </button>
                     <button
                       disabled={currentPage === totalPages}
                       onClick={() => setCurrentPage(totalPages)}
-                      className={`px-2.5 py-1 text-xs rounded-lg disabled:opacity-40 ${isLightMode ? 'bg-slate-200 text-slate-700 hover:bg-slate-300' : 'bg-slate-800 text-slate-200 hover:bg-slate-700'}`}
+                      className={`px-2.5 py-1 text-xs font-bold rounded-lg disabled:opacity-40 ${isLightMode ? 'bg-slate-200 text-slate-800 hover:bg-slate-300 border border-slate-300' : 'bg-slate-800 text-slate-200 hover:bg-slate-700'}`}
                     >
                       Última »
                     </button>
