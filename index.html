@@ -361,8 +361,9 @@
                 <h2 className="text-xl font-black tracking-tight leading-tight mt-1 text-sky-400">
                   {item.proponente}
                 </h2>
-                <p className="text-xs text-slate-400 font-medium flex items-center gap-2">
+                <p className="text-xs text-slate-400 font-medium flex items-center gap-2 flex-wrap">
                   <span>UF: <strong>{item.uf}</strong></span> • 
+                  <span>Cidade Sede: <strong>{item.cidadeSede}</strong></span> • 
                   <span>Exercício: <strong>{item.ano}</strong></span> • 
                   <span>Modalidade: <strong>{item.rp}</strong></span>
                 </p>
@@ -703,14 +704,15 @@
           const idxAno = findColIdx(['ano']);
           const idxProponente = findColIdx(['proponente', 'nome', 'convenente']);
           const idxParlamentar = findColIdx(['parlamentar', 'deputado', 'senador', 'autor']);
-          const idxUF = findColIdx(['uf', 'estado']);
+          const idxUF = findColIdx(['uf do proponente', 'uf', 'estado']);
+          const idxCidadeSede = findColIdx(['cidade sede', 'cidade', 'município', 'municipio']);
           const idxInstrumento = findColIdx(['instrumento', 'número', 'numero', 'nº', 'convênio']);
           const idxNumProposta = findColIdx(['número da proposta', 'numero da proposta', 'proposta']);
           const idxModalidade = findColIdx(['modalidade', 'mod', 'mod. aplic', 'mod.aplic.', 'rp']);
-          const idxSEI = findColIdx(['nº sei', 'sei', 'numero sei', 'número sei', 'processo sei', 'processo']);
+          const idxSEI = findColIdx(['número do processo sei', 'nº sei', 'sei', 'numero sei', 'número sei', 'processo sei', 'processo']);
           const idxPrograma = findColIdx(['código do programa', 'codigo do programa', 'cod. programa', 'programa']);
-          const idxInicioVigencia = findColIdx(['início da vigência', 'inicio da vigencia', 'início vigência', 'inicio vigencia', 'data início', 'data inicio']);
-          const idxFimVigencia = findColIdx(['fim da vigência', 'fim da vigencia', 'término vigência', 'termino vigencia', 'data fim', 'término', 'termino']);
+          const idxInicioVigencia = findColIdx(['data início vigência', 'início da vigência', 'inicio da vigencia', 'início vigência', 'inicio vigencia', 'data início', 'data inicio']);
+          const idxFimVigencia = findColIdx(['data fim vigência', 'fim da vigência', 'fim da vigencia', 'término vigência', 'termino vigencia', 'data fim', 'término', 'termino']);
           const idxRepasseProposta = findColIdx(['valor de repasse da proposta', 'repasse da proposta', 'valor repasse', 'valor de repasse']);
           const idxGlobal = findColIdx(['valor global', 'total do plano', 'valor total', 'valor']);
           const idxEmpenho = findColIdx(['empenho', 'valor do empenho']);
@@ -739,6 +741,7 @@
 
             const parlamentar = idxParlamentar !== -1 && row[idxParlamentar] ? String(row[idxParlamentar]).trim() : '-';
             const uf = idxUF !== -1 && row[idxUF] ? String(row[idxUF]).trim().toUpperCase() : 'BR';
+            const cidadeSede = idxCidadeSede !== -1 && row[idxCidadeSede] ? String(row[idxCidadeSede]).trim() : '-';
             const anoCelebracao = idxAno !== -1 && row[idxAno] ? String(row[idxAno]).split('.')[0].trim() : String(currentYear);
             const codInst = idxInstrumento !== -1 && row[idxInstrumento] ? String(row[idxInstrumento]).trim() : '';
             const numProposta = idxNumProposta !== -1 && row[idxNumProposta] ? String(row[idxNumProposta]).trim() : '-';
@@ -793,6 +796,7 @@
               diasParaVencer,
               alertaVigencia,
               uf: (uf && uf.length === 2) ? uf : 'BR',
+              cidadeSede: cidadeSede || '-',
               ano: anoCelebracao || String(currentYear),
               dataRepasse: dataRepasseFmt,
               anoRepasse: anoRepasseReal,
@@ -977,6 +981,7 @@
           if (filterFaltaRepassar && item.empenho <= item.repassado) return false;
 
           if (search && !item.proponente.toLowerCase().includes(search.toLowerCase()) && 
+              !item.cidadeSede.toLowerCase().includes(search.toLowerCase()) &&
               !item.parlamentar.toLowerCase().includes(search.toLowerCase()) && 
               !item.obs.toLowerCase().includes(search.toLowerCase()) && 
               !item.numSEI.toLowerCase().includes(search.toLowerCase()) &&
@@ -1047,6 +1052,7 @@
           'Nº SEI': d.numSEI,
           'Parlamentar': d.parlamentar,
           'UF': d.uf,
+          'Cidade Sede': d.cidadeSede,
           'Início Vigência': d.inicioVigencia,
           'Fim Vigência': d.fimVigencia,
           'Dias para Vencer': d.diasParaVencer !== null ? d.diasParaVencer : '-',
@@ -1604,7 +1610,7 @@
 
                       <input
                         type="text"
-                        placeholder="Buscar proponente, parlamentar, SEI..."
+                        placeholder="Buscar proponente, cidade, parlamentar, SEI..."
                         value={search}
                         onChange={(e) => { setSearch(e.target.value); setCurrentPage(1); }}
                         className={`border rounded-xl px-4 py-1.5 text-xs focus:outline-none focus:border-blue-500 w-full sm:w-64 ${isLightMode ? 'bg-white border-slate-300 text-slate-800' : 'bg-slate-950 border-slate-800 text-white'}`}
@@ -1968,6 +1974,9 @@
                         <th onClick={() => handleSort('uf')} className="p-3 text-center cursor-pointer hover:text-blue-500 whitespace-nowrap">
                           UF {renderSortIndicator('uf')}
                         </th>
+                        <th onClick={() => handleSort('cidadeSede')} className="p-3 text-center cursor-pointer hover:text-blue-500 whitespace-nowrap">
+                          Cidade Sede {renderSortIndicator('cidadeSede')}
+                        </th>
                         <th onClick={() => handleSort('inicioVigencia')} className="p-3 text-center cursor-pointer hover:text-blue-500 print-hide-col whitespace-nowrap">
                           Início Vig. {renderSortIndicator('inicioVigencia')}
                         </th>
@@ -2022,6 +2031,7 @@
                             </td>
                             <td className="p-3 text-center font-medium text-amber-400 whitespace-nowrap">{item.parlamentar}</td>
                             <td className="p-3 text-center font-bold">{item.uf}</td>
+                            <td className="p-3 text-center font-semibold text-sky-300 whitespace-nowrap">{item.cidadeSede}</td>
                             <td className="p-3 text-center whitespace-nowrap print-hide-col">{item.inicioVigencia}</td>
                             <td className="p-3 text-center whitespace-nowrap">
                               <div className="font-bold">{item.fimVigencia}</div>
