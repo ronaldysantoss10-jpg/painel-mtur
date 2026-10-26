@@ -432,7 +432,7 @@
               </div>
             </div>
 
-            {/* DETALHES COMPLEMENTARES (PARLAMENTAR, PROGRAMA, VIGÊNCIA) */}
+            {/* DETALHES COMPLEMENTARES (PARLAMENTAR, PROGRAMA, VIGÊNCIA, OBJETO) */}
             <div className={`p-4 rounded-2xl border space-y-3 ${isLightMode ? 'bg-slate-50 border-slate-300' : 'bg-slate-950/40 border-slate-800'}`}>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                 <div>
@@ -456,6 +456,18 @@
                     {riskStatus.icon} {riskStatus.label}
                   </span>
                 </div>
+              </div>
+
+              {/* CAMPO OBJETO DO INSTRUMENTO */}
+              <div className={`pt-3 border-t text-xs ${isLightMode ? 'border-slate-300' : 'border-slate-700/40'}`}>
+                <span className={`font-semibold block uppercase tracking-wider ${isLightMode ? 'text-blue-900' : 'text-sky-400'}`}>
+                  📌 Objeto do Instrumento:
+                </span>
+                <p className={`mt-1 leading-relaxed font-medium p-2.5 rounded-xl border ${
+                  isLightMode ? 'bg-white border-slate-200 text-slate-800' : 'bg-slate-900/60 border-slate-800 text-slate-200'
+                }`}>
+                  {item.objeto && item.objeto !== '-' ? item.objeto : 'Objeto não informado.'}
+                </p>
               </div>
 
               {item.obs && item.obs !== '-' && (
@@ -706,6 +718,7 @@
 
           const idxAno = findColIdx(['ano']);
           const idxProponente = findColIdx(['proponente', 'nome', 'convenente']);
+          const idxObjeto = findColIdx(['objeto', 'descrição do objeto', 'descricao do objeto']);
           const idxParlamentar = findColIdx(['parlamentar', 'deputado', 'senador', 'autor']);
           const idxUF = findColIdx(['uf do proponente', 'uf', 'estado']);
           const idxCidadeSede = findColIdx(['cidade sede', 'cidade', 'município', 'municipio']);
@@ -742,6 +755,7 @@
               continue;
             }
 
+            const objetoVal = idxObjeto !== -1 && row[idxObjeto] ? String(row[idxObjeto]).trim() : '-';
             const parlamentar = idxParlamentar !== -1 && row[idxParlamentar] ? String(row[idxParlamentar]).trim() : '-';
             const uf = idxUF !== -1 && row[idxUF] ? String(row[idxUF]).trim().toUpperCase() : 'BR';
             const cidadeSede = idxCidadeSede !== -1 && row[idxCidadeSede] ? String(row[idxCidadeSede]).trim() : '-';
@@ -790,6 +804,7 @@
               numProposta: numProposta || '-',
               rp: rpVal || 'RP Não Ind.',
               proponente: proponente || 'N/A',
+              objeto: objetoVal || '-',
               parlamentar: parlamentar || '-',
               numSEI: numSEI || '-',
               codPrograma,
@@ -989,6 +1004,7 @@
           if (filterNaoEmpenhados && (item.instrumento === 'TED' ? true : item.global <= item.empenho)) return false;
 
           if (search && !item.proponente.toLowerCase().includes(search.toLowerCase()) && 
+              !item.objeto.toLowerCase().includes(search.toLowerCase()) &&
               !item.cidadeSede.toLowerCase().includes(search.toLowerCase()) &&
               !item.parlamentar.toLowerCase().includes(search.toLowerCase()) && 
               !item.obs.toLowerCase().includes(search.toLowerCase()) && 
@@ -1056,6 +1072,7 @@
           'Instrumento': d.instrumento,
           'Modalidade': d.rp,
           'Proponente': d.proponente,
+          'Objeto': d.objeto,
           'Nº Proposta': d.numProposta,
           'Nº SEI': d.numSEI,
           'Parlamentar': d.parlamentar,
@@ -1626,7 +1643,7 @@
 
                       <input
                         type="text"
-                        placeholder="Buscar proponente, cidade, parlamentar, SEI..."
+                        placeholder="Buscar proponente, objeto, cidade, parlamentar, SEI..."
                         value={search}
                         onChange={(e) => { setSearch(e.target.value); setCurrentPage(1); }}
                         className={`border rounded-xl px-4 py-1.5 text-xs focus:outline-none focus:border-blue-500 w-full sm:w-64 font-semibold ${isLightMode ? 'bg-white border-slate-300 text-slate-900' : 'bg-slate-950 border-slate-800 text-white'}`}
