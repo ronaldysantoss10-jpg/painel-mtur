@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Painel Executivo de Monitoramento - MTur</title>
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -44,11 +44,6 @@
       text-anchor: middle;
       dominant-baseline: central;
       text-shadow: 0px 1px 3px rgba(0,0,0,0.9);
-    }
-
-    /* Trava o scroll do body apenas no Desktop/Tablet quando modal abre */
-    body.modal-open {
-      overflow: hidden;
     }
 
     /* --- ESTILOS EXCLUSIVOS DE IMPRESSÃO --- */
@@ -233,24 +228,24 @@
       return (
         <div className="flex flex-col items-center w-full relative">
           {singleSelectedUF && focusedInfo && (
-            <div className={`absolute top-2 left-2 z-20 border rounded-2xl p-3 sm:p-4 shadow-2xl backdrop-blur-xl animate-fadeIn transition-all text-xs max-w-[220px] sm:max-w-[240px] w-full ${
+            <div className={`absolute top-2 left-2 z-20 border rounded-2xl p-4 shadow-2xl backdrop-blur-xl animate-fadeIn transition-all text-xs max-w-[240px] w-full ${
               isLightMode 
                 ? 'bg-white/95 border-slate-300 text-slate-900 shadow-slate-300/60' 
                 : 'bg-slate-900/85 border-slate-700/60 text-slate-100 shadow-black/80'
             }`}>
-              <div className="flex items-center justify-between border-b pb-2 mb-2 sm:mb-3 border-emerald-500/30">
+              <div className="flex items-center justify-between border-b pb-2 mb-3 border-emerald-500/30">
                 <div className="flex items-center gap-2">
                   <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                  <span className={`font-black text-xs sm:text-sm tracking-wide ${isLightMode ? 'text-emerald-700' : 'text-emerald-400'}`}>
+                  <span className={`font-black text-sm tracking-wide ${isLightMode ? 'text-emerald-700' : 'text-emerald-400'}`}>
                     {ufNames[singleSelectedUF]} ({singleSelectedUF})
                   </span>
                 </div>
-                <span className={`text-[9px] sm:text-[10px] border font-bold px-2 py-0.5 rounded-full uppercase tracking-wider ${isLightMode ? 'bg-emerald-100 border-emerald-300 text-emerald-800' : 'bg-emerald-500/15 border-emerald-500/30 text-emerald-400'}`}>
+                <span className={`text-[10px] border font-bold px-2 py-0.5 rounded-full uppercase tracking-wider ${isLightMode ? 'bg-emerald-100 border-emerald-300 text-emerald-800' : 'bg-emerald-500/15 border-emerald-500/30 text-emerald-400'}`}>
                   Focado
                 </span>
               </div>
 
-              <div className="space-y-1.5 sm:space-y-2 text-[10px] sm:text-[11px] font-medium">
+              <div className="space-y-2 text-[11px] font-medium">
                 <div className={`flex items-center justify-between p-1.5 rounded-lg ${isLightMode ? 'bg-slate-100' : 'bg-slate-800/20'}`}>
                   <span className={isLightMode ? 'text-slate-600' : 'text-slate-400'}>Vol. Global:</span>
                   <span className={`font-extrabold ${isLightMode ? 'text-slate-900' : 'text-slate-100'}`}>{fmtR$(focusedInfo.total)}</span>
@@ -267,7 +262,7 @@
                   <span className={isLightMode ? 'text-rose-800 font-semibold' : 'text-rose-400/90 font-semibold'}>Falta Repassar:</span>
                   <span className={`font-bold ${isLightMode ? 'text-rose-900' : 'text-rose-400'}`}>{fmtR$(faltaRepassarFocused)}</span>
                 </div>
-                <div className={`flex items-center justify-between pt-1.5 border-t px-1 ${isLightMode ? 'border-slate-200' : 'border-slate-700/40'}`}>
+                <div className={`flex items-center justify-between pt-2 border-t px-1 ${isLightMode ? 'border-slate-200' : 'border-slate-700/40'}`}>
                   <span className={isLightMode ? 'text-slate-600' : 'text-slate-400'}>Processos:</span>
                   <span className={`font-black px-2 py-0.5 rounded-md border ${isLightMode ? 'text-sky-900 bg-sky-100 border-sky-300' : 'text-sky-400 bg-sky-500/10 border-sky-500/20'}`}>
                     {focusedInfo.count || 0}
@@ -279,7 +274,7 @@
 
           <svg 
             viewBox={activeViewBox} 
-            className={`w-full filter drop-shadow-xl transition-all duration-500 ease-in-out ${isModal ? 'h-[280px] sm:h-[420px]' : 'h-64 sm:h-80 max-w-sm'}`}
+            className={`w-full filter drop-shadow-xl transition-all duration-500 ease-in-out ${isModal ? 'h-[420px]' : 'h-80 max-w-sm'}`}
           >
             <g>
               {Object.keys(ufMapDetails).map(uf => {
@@ -325,7 +320,7 @@
             </g>
           </svg>
           
-          <div className={`text-[10px] sm:text-[11px] mt-2 sm:mt-3 flex flex-wrap items-center justify-center gap-2 sm:gap-4 px-3 py-1.5 rounded-full border shadow-sm print:text-black print:bg-transparent print:border-none ${isLightMode ? 'bg-white text-slate-800 border-slate-300 font-semibold' : 'bg-slate-900/90 text-slate-300 border-slate-800'}`}>
+          <div className={`text-[11px] mt-3 flex items-center justify-center gap-4 px-4 py-1.5 rounded-full border shadow-sm print:text-black print:bg-transparent print:border-none ${isLightMode ? 'bg-white text-slate-800 border-slate-300 font-semibold' : 'bg-slate-900/90 text-slate-300 border-slate-800'}`}>
             <span className="flex items-center gap-1.5 font-medium"><span className="w-2.5 h-2.5 rounded-full bg-sky-600 inline-block shadow-sm"></span> Com Repasse</span>
             <span className="flex items-center gap-1.5 font-medium"><span className="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block shadow-sm"></span> Selecionado</span>
             <span className="flex items-center gap-1.5 font-medium"><span className={`w-2.5 h-2.5 rounded-full border inline-block ${isLightMode ? 'bg-slate-300 border-slate-400' : 'bg-slate-700 border-slate-500'}`}></span> Sem Repasse</span>
@@ -334,7 +329,7 @@
       );
     };
 
-    // MODAL MODERNO DE DETALHAMENTO DO INSTRUMENTO (FICHA EXECUTIVA OPTIMIZADO PARA CELULAR)
+    // MODAL MODERNO DE DETALHAMENTO DO INSTRUMENTO (FICHA EXECUTIVA)
     const InstrumentDetailModal = ({ item, onClose, isLightMode, riskStatus }) => {
       useEffect(() => {
         document.body.classList.add('modal-open');
@@ -347,26 +342,26 @@
       const pctExecucao = item.empenho > 0 ? ((item.repassado / item.empenho) * 100).toFixed(1) : (item.global > 0 ? ((item.repassado / item.global) * 100).toFixed(1) : '0.0');
 
       return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/85 backdrop-blur-md p-2 sm:p-4 animate-fadeIn overflow-y-auto">
-          <div className={`border rounded-2xl sm:rounded-3xl p-4 sm:p-8 w-full max-w-2xl shadow-2xl flex flex-col gap-4 sm:gap-6 relative transition-all max-h-[92vh] sm:max-h-[90vh] overflow-y-auto ${
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-md p-4 animate-fadeIn">
+          <div className={`border rounded-3xl p-6 sm:p-8 w-full max-w-2xl shadow-2xl flex flex-col gap-6 relative transition-all ${
             isLightMode ? 'bg-white border-slate-300 text-slate-900' : 'bg-slate-900 border-slate-800 text-slate-100'
           }`}>
             
             {/* CABEÇALHO DA FICHA */}
-            <div className={`flex items-start justify-between border-b pb-3 sm:pb-4 ${isLightMode ? 'border-slate-200' : 'border-slate-700/40'}`}>
-              <div className="space-y-1 pr-3 sm:pr-6">
-                <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
-                  <span className="text-[9px] sm:text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-blue-700 text-white shadow-sm">
+            <div className={`flex items-start justify-between border-b pb-4 ${isLightMode ? 'border-slate-200' : 'border-slate-700/40'}`}>
+              <div className="space-y-1 pr-6">
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-full bg-blue-700 text-white shadow-sm">
                     Ficha Executiva do Instrumento
                   </span>
-                  <span className={`text-[9px] sm:text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full border ${isLightMode ? 'bg-slate-100 border-slate-300 text-blue-900' : 'bg-slate-800 border-slate-700 text-sky-400'}`}>
+                  <span className={`text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-full border ${isLightMode ? 'bg-slate-100 border-slate-300 text-blue-900' : 'bg-slate-800 border-slate-700 text-sky-400'}`}>
                     {item.instrumento}
                   </span>
                 </div>
-                <h2 className={`text-base sm:text-xl font-black tracking-tight leading-snug sm:leading-tight mt-1 break-words ${isLightMode ? 'text-blue-950' : 'text-sky-400'}`}>
+                <h2 className={`text-xl font-black tracking-tight leading-tight mt-1 ${isLightMode ? 'text-blue-950' : 'text-sky-400'}`}>
                   {item.proponente}
                 </h2>
-                <p className={`text-[11px] sm:text-xs font-medium flex items-center gap-1.5 sm:gap-2 flex-wrap ${isLightMode ? 'text-slate-700' : 'text-slate-400'}`}>
+                <p className={`text-xs font-medium flex items-center gap-2 flex-wrap ${isLightMode ? 'text-slate-700' : 'text-slate-400'}`}>
                   <span>UF: <strong>{item.uf}</strong></span> • 
                   <span>Cidade Sede: <strong>{item.cidadeSede}</strong></span> • 
                   <span>Exercício: <strong>{item.ano}</strong></span> • 
@@ -376,7 +371,7 @@
 
               <button
                 onClick={onClose}
-                className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center font-bold text-xs sm:text-sm transition-all shrink-0 ${
+                className={`w-9 h-9 rounded-full flex items-center justify-center font-bold text-sm transition-all ${
                   isLightMode ? 'bg-slate-100 hover:bg-slate-200 text-slate-800' : 'bg-slate-800 hover:bg-slate-700 text-slate-300'
                 }`}
               >
@@ -385,50 +380,50 @@
             </div>
 
             {/* DADOS DE IDENTIFICAÇÃO E SEI */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
-              <div className={`p-3 sm:p-3.5 rounded-xl sm:rounded-2xl border ${isLightMode ? 'bg-slate-50 border-slate-300' : 'bg-slate-950/60 border-slate-800'}`}>
-                <span className={`text-[9px] sm:text-[10px] font-bold uppercase tracking-wider block mb-0.5 sm:mb-1 ${isLightMode ? 'text-slate-700' : 'text-slate-400'}`}>Processo SEI</span>
-                <span className={`font-mono text-xs sm:text-sm font-bold select-all block break-all ${isLightMode ? 'text-cyan-900' : 'text-cyan-400'}`}>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className={`p-3.5 rounded-2xl border ${isLightMode ? 'bg-slate-50 border-slate-300' : 'bg-slate-950/60 border-slate-800'}`}>
+                <span className={`text-[10px] font-bold uppercase tracking-wider block mb-1 ${isLightMode ? 'text-slate-700' : 'text-slate-400'}`}>Processo SEI</span>
+                <span className={`font-mono text-xs sm:text-sm font-bold select-all block truncate ${isLightMode ? 'text-cyan-900' : 'text-cyan-400'}`}>
                   {item.numSEI}
                 </span>
               </div>
 
-              <div className={`p-3 sm:p-3.5 rounded-xl sm:rounded-2xl border ${isLightMode ? 'bg-slate-50 border-slate-300' : 'bg-slate-950/60 border-slate-800'}`}>
-                <span className={`text-[9px] sm:text-[10px] font-bold uppercase tracking-wider block mb-0.5 sm:mb-1 ${isLightMode ? 'text-slate-700' : 'text-slate-400'}`}>Nº Proposta</span>
-                <span className={`font-mono text-xs sm:text-sm font-bold block break-all ${isLightMode ? 'text-amber-900' : 'text-amber-400'}`}>
+              <div className={`p-3.5 rounded-2xl border ${isLightMode ? 'bg-slate-50 border-slate-300' : 'bg-slate-950/60 border-slate-800'}`}>
+                <span className={`text-[10px] font-bold uppercase tracking-wider block mb-1 ${isLightMode ? 'text-slate-700' : 'text-slate-400'}`}>Nº Proposta</span>
+                <span className={`font-mono text-xs sm:text-sm font-bold truncate block ${isLightMode ? 'text-amber-900' : 'text-amber-400'}`}>
                   {item.numProposta}
                 </span>
               </div>
             </div>
 
             {/* CARDS DE VALORES FINANCEIROS */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
-              <div className={`p-2.5 sm:p-3 rounded-xl sm:rounded-2xl border ${isLightMode ? 'bg-slate-50 border-slate-300 text-slate-900' : 'bg-slate-950/80 border-slate-800 text-white'}`}>
-                <span className={`text-[9px] sm:text-[10px] font-semibold block uppercase ${isLightMode ? 'text-slate-700' : 'text-slate-400'}`}>Valor Global</span>
-                <span className="text-xs sm:text-sm font-black mt-0.5 sm:mt-1 block truncate">{fmtR$(item.global)}</span>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <div className={`p-3 rounded-2xl border ${isLightMode ? 'bg-slate-50 border-slate-300 text-slate-900' : 'bg-slate-950/80 border-slate-800 text-white'}`}>
+                <span className={`text-[10px] font-semibold block uppercase ${isLightMode ? 'text-slate-700' : 'text-slate-400'}`}>Valor Global</span>
+                <span className="text-sm font-black mt-1 block">{fmtR$(item.global)}</span>
               </div>
 
-              <div className={`p-2.5 sm:p-3 rounded-xl sm:rounded-2xl border ${isLightMode ? 'bg-amber-50 border-amber-300 text-amber-950' : 'bg-amber-950/20 border-amber-800/40 text-amber-400'}`}>
-                <span className={`text-[9px] sm:text-[10px] font-semibold block uppercase ${isLightMode ? 'text-amber-900' : 'text-amber-500'}`}>Empenhado</span>
-                <span className="text-xs sm:text-sm font-black mt-0.5 sm:mt-1 block truncate">
+              <div className={`p-3 rounded-2xl border ${isLightMode ? 'bg-amber-50 border-amber-300 text-amber-950' : 'bg-amber-950/20 border-amber-800/40 text-amber-400'}`}>
+                <span className={`text-[10px] font-semibold block uppercase ${isLightMode ? 'text-amber-900' : 'text-amber-500'}`}>Empenhado</span>
+                <span className="text-sm font-black mt-1 block">
                   {item.instrumento === 'TED' ? 'N/A (TED)' : fmtR$(item.empenho)}
                 </span>
               </div>
 
-              <div className={`p-2.5 sm:p-3 rounded-xl sm:rounded-2xl border ${isLightMode ? 'bg-emerald-50 border-emerald-300 text-emerald-950' : 'bg-emerald-950/20 border-emerald-800/40 text-emerald-400'}`}>
-                <span className={`text-[9px] sm:text-[10px] font-semibold block uppercase ${isLightMode ? 'text-emerald-900' : 'text-emerald-500'}`}>Repassado</span>
-                <span className="text-xs sm:text-sm font-black mt-0.5 sm:mt-1 block truncate">{fmtR$(item.repassado)}</span>
+              <div className={`p-3 rounded-2xl border ${isLightMode ? 'bg-emerald-50 border-emerald-300 text-emerald-950' : 'bg-emerald-950/20 border-emerald-800/40 text-emerald-400'}`}>
+                <span className={`text-[10px] font-semibold block uppercase ${isLightMode ? 'text-emerald-900' : 'text-emerald-500'}`}>Repassado</span>
+                <span className="text-sm font-black mt-1 block">{fmtR$(item.repassado)}</span>
               </div>
 
-              <div className={`p-2.5 sm:p-3 rounded-xl sm:rounded-2xl border ${isLightMode ? 'bg-rose-50 border-rose-300 text-rose-950' : 'bg-rose-950/20 border-rose-800/40 text-rose-400'}`}>
-                <span className={`text-[9px] sm:text-[10px] font-semibold block uppercase ${isLightMode ? 'text-rose-900' : 'text-rose-500'}`}>Saldo Repasse</span>
-                <span className="text-xs sm:text-sm font-black mt-0.5 sm:mt-1 block truncate">{fmtR$(faltaRepassar)}</span>
+              <div className={`p-3 rounded-2xl border ${isLightMode ? 'bg-rose-50 border-rose-300 text-rose-950' : 'bg-rose-950/20 border-rose-800/40 text-rose-400'}`}>
+                <span className={`text-[10px] font-semibold block uppercase ${isLightMode ? 'text-rose-900' : 'text-rose-500'}`}>Saldo Repasse</span>
+                <span className="text-sm font-black mt-1 block">{fmtR$(faltaRepassar)}</span>
               </div>
             </div>
 
             {/* BARRA DE PROGRESSO DE REPASSE */}
-            <div className="space-y-1">
-              <div className="flex justify-between text-[11px] sm:text-xs font-semibold">
+            <div className="space-y-1.5">
+              <div className="flex justify-between text-xs font-semibold">
                 <span className={isLightMode ? 'text-slate-700' : 'text-slate-400'}>Progresso do Repasse Financeiro</span>
                 <span className={`font-bold ${isLightMode ? 'text-emerald-800' : 'text-emerald-400'}`}>{pctExecucao}% Pago</span>
               </div>
@@ -438,11 +433,11 @@
             </div>
 
             {/* DETALHES COMPLEMENTARES (PARLAMENTAR, PROGRAMA, VIGÊNCIA, OBJETO) */}
-            <div className={`p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border space-y-3 ${isLightMode ? 'bg-slate-50 border-slate-300' : 'bg-slate-950/40 border-slate-800'}`}>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3 text-xs">
+            <div className={`p-4 rounded-2xl border space-y-3 ${isLightMode ? 'bg-slate-50 border-slate-300' : 'bg-slate-950/40 border-slate-800'}`}>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                 <div>
                   <span className={`font-medium block ${isLightMode ? 'text-slate-700' : 'text-slate-400'}`}>Autor / Parlamentar:</span>
-                  <span className={`font-extrabold text-xs sm:text-sm ${isLightMode ? 'text-amber-900' : 'text-amber-400'}`}>{item.parlamentar}</span>
+                  <span className={`font-extrabold text-sm ${isLightMode ? 'text-amber-900' : 'text-amber-400'}`}>{item.parlamentar}</span>
                 </div>
 
                 <div>
@@ -457,18 +452,18 @@
 
                 <div>
                   <span className={`font-medium block ${isLightMode ? 'text-slate-700' : 'text-slate-400'}`}>Situação do Prazo:</span>
-                  <span className={`inline-block mt-0.5 text-[9px] sm:text-[10px] px-2 py-0.5 rounded-full font-black uppercase ${riskStatus.badgeBg}`}>
+                  <span className={`inline-block mt-0.5 text-[10px] px-2.5 py-0.5 rounded-full font-black uppercase ${riskStatus.badgeBg}`}>
                     {riskStatus.icon} {riskStatus.label}
                   </span>
                 </div>
               </div>
 
               {/* CAMPO OBJETO DO INSTRUMENTO */}
-              <div className={`pt-2.5 border-t text-xs ${isLightMode ? 'border-slate-300' : 'border-slate-700/40'}`}>
-                <span className={`font-semibold block uppercase tracking-wider text-[11px] sm:text-xs ${isLightMode ? 'text-blue-900' : 'text-sky-400'}`}>
+              <div className={`pt-3 border-t text-xs ${isLightMode ? 'border-slate-300' : 'border-slate-700/40'}`}>
+                <span className={`font-semibold block uppercase tracking-wider ${isLightMode ? 'text-blue-900' : 'text-sky-400'}`}>
                   📌 Objeto do Instrumento:
                 </span>
-                <p className={`mt-1 leading-relaxed font-medium p-2.5 rounded-xl border text-xs ${
+                <p className={`mt-1 leading-relaxed font-medium p-2.5 rounded-xl border ${
                   isLightMode ? 'bg-white border-slate-200 text-slate-800' : 'bg-slate-900/60 border-slate-800 text-slate-200'
                 }`}>
                   {item.objeto && item.objeto !== '-' ? item.objeto : 'Objeto não informado.'}
@@ -484,10 +479,10 @@
             </div>
 
             {/* RODAPÉ E BOTÃO DE FECHAR */}
-            <div className={`flex justify-end pt-1 sm:pt-2 border-t ${isLightMode ? 'border-slate-300' : 'border-slate-700/40'}`}>
+            <div className={`flex justify-end pt-2 border-t ${isLightMode ? 'border-slate-300' : 'border-slate-700/40'}`}>
               <button
                 onClick={onClose}
-                className="w-full sm:w-auto bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs px-6 py-3 sm:py-2.5 rounded-xl transition-all shadow-md active:scale-95"
+                className="bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs px-6 py-2.5 rounded-xl transition-all shadow-md active:scale-95"
               >
                 Fechar Ficha
               </button>
@@ -517,16 +512,16 @@
       }, [chartConfig, isMap]);
 
       return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-md p-2 sm:p-4 overflow-y-auto">
-          <div id="print-modal-container" className={`border rounded-2xl sm:rounded-3xl p-4 sm:p-6 w-full max-w-4xl shadow-2xl flex flex-col gap-4 max-h-[92vh] overflow-y-auto ${isLightMode ? 'bg-white border-slate-300 text-slate-900' : 'bg-slate-900 border-slate-700 text-white'}`}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-md p-4">
+          <div id="print-modal-container" className={`border rounded-3xl p-6 w-full max-w-4xl shadow-2xl flex flex-col gap-4 ${isLightMode ? 'bg-white border-slate-300 text-slate-900' : 'bg-slate-900 border-slate-700 text-white'}`}>
             <div className="flex items-center justify-between border-b pb-3 no-print">
-              <h2 className="text-sm sm:text-lg font-bold flex items-center gap-2 truncate pr-2">
+              <h2 className="text-lg font-bold flex items-center gap-2">
                 📊 {title}
               </h2>
-              <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+              <div className="flex items-center gap-3">
                 <button
                   onClick={() => window.print()}
-                  className="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold px-3 sm:px-4 py-2 rounded-xl transition-all shadow-md flex items-center gap-1.5"
+                  className="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold px-4 py-2 rounded-xl transition-all shadow-md flex items-center gap-1.5"
                 >
                   🖨️ Imprimir
                 </button>
@@ -534,7 +529,7 @@
                   onClick={onClose}
                   className={`text-xs font-bold px-3 py-2 rounded-xl transition-all ${isLightMode ? 'bg-slate-200 hover:bg-slate-300 text-slate-800' : 'bg-slate-800 hover:bg-slate-700 text-slate-300'}`}
                 >
-                  ✕
+                  ✕ Fechar
                 </button>
               </div>
             </div>
@@ -544,7 +539,7 @@
               <p className="text-sm text-gray-600">{title}</p>
             </div>
 
-            <div className={`h-[350px] sm:h-[480px] relative w-full p-2 sm:p-4 rounded-2xl border flex items-center justify-center print:bg-white print:border-none ${isLightMode ? 'bg-slate-50 border-slate-200' : 'bg-slate-950/40 border-slate-800/50'}`}>
+            <div className={`h-[480px] relative w-full p-4 rounded-2xl border flex items-center justify-center print:bg-white print:border-none ${isLightMode ? 'bg-slate-50 border-slate-200' : 'bg-slate-950/40 border-slate-800/50'}`}>
               {isMap ? (
                 <BrazilMapSVG {...mapProps} isModal={true} isLightMode={isLightMode} />
               ) : (
@@ -1258,14 +1253,14 @@
             responsive: true, 
             maintainAspectRatio: false, 
             clip: false,
-            layout: { padding: { top: 15, left: 5, right: 5 } },
+            layout: { padding: { top: 15, left: 10, right: 10 } },
             plugins: { 
-              legend: { display: true, position: 'top', labels: { color: textColor, font: { size: 10, weight: 'bold' }, boxWidth: 10 } },
+              legend: { display: true, position: 'top', labels: { color: textColor, font: { size: 11, weight: 'bold' }, boxWidth: 12 } },
               tooltip: { callbacks: { label: tooltipCallback } }
             }, 
             scales: { 
-              x: { ticks: { color: textColor, font: { weight: 'bold', size: 10 }, maxRotation: 0, minRotation: 0 }, grid: { display: false } }, 
-              y: { grace: '10%', ticks: { color: textColor, font: { weight: 'bold', size: 10 }, callback: (val) => formatMillionsAxis(val) }, grid: { color: gridColor } } 
+              x: { ticks: { color: textColor, font: { weight: 'bold' }, maxRotation: 0, minRotation: 0 }, grid: { display: false } }, 
+              y: { grace: '10%', ticks: { color: textColor, font: { weight: 'bold' }, callback: (val) => formatMillionsAxis(val) }, grid: { color: gridColor } } 
             },
             onClick: (e, elements) => {
               if (elements.length > 0) {
@@ -1304,19 +1299,19 @@
             indexAxis: 'y',
             responsive: true,
             maintainAspectRatio: false,
-            layout: { padding: { right: 15 } },
+            layout: { padding: { right: 25 } },
             plugins: {
-              legend: { display: true, position: 'top', labels: { color: textColor, font: { size: 10, weight: 'bold' }, boxWidth: 10 } },
+              legend: { display: true, position: 'top', labels: { color: textColor, font: { size: 11, weight: 'bold' }, boxWidth: 12 } },
               tooltip: { callbacks: { label: tooltipCallback } }
             },
             scales: {
               x: {
                 grace: '15%',
-                ticks: { color: textColor, font: { weight: 'bold', size: 10 }, callback: (val) => formatMillionsAxis(val) },
+                ticks: { color: textColor, font: { weight: 'bold' }, callback: (val) => formatMillionsAxis(val) },
                 grid: { color: gridColor }
               },
               y: {
-                ticks: { color: textColor, font: { size: 9, weight: 'bold' } },
+                ticks: { color: textColor, font: { size: 10, weight: 'bold' } },
                 grid: { display: false }
               }
             },
@@ -1356,14 +1351,14 @@
             indexAxis: 'y', 
             responsive: true, 
             maintainAspectRatio: false, 
-            layout: { padding: { right: 15 } },
+            layout: { padding: { right: 25 } },
             plugins: { 
-              legend: { display: true, position: 'top', labels: { color: textColor, font: { size: 10, weight: 'bold' }, boxWidth: 10 } },
+              legend: { display: true, position: 'top', labels: { color: textColor, font: { size: 11, weight: 'bold' }, boxWidth: 12 } },
               tooltip: { callbacks: { label: tooltipCallback } }
             }, 
             scales: { 
-              x: { grace: '15%', ticks: { color: textColor, font: { weight: 'bold', size: 10 }, callback: (val) => formatMillionsAxis(val) }, grid: { color: gridColor } }, 
-              y: { ticks: { color: textColor, font: { weight: 'bold', size: 9 } }, grid: { display: false } } 
+              x: { grace: '15%', ticks: { color: textColor, font: { weight: 'bold' }, callback: (val) => formatMillionsAxis(val) }, grid: { color: gridColor } }, 
+              y: { ticks: { color: textColor, font: { weight: 'bold' } }, grid: { display: false } } 
             },
             onClick: (e, elements) => {
               if (elements.length > 0) {
@@ -1410,7 +1405,7 @@
               centerValueColor,
               legend: { 
                 position: 'bottom', 
-                labels: { color: textColor, font: { size: 10, weight: 'bold' } }
+                labels: { color: textColor, font: { size: 11, weight: 'bold' } }
               },
               tooltip: pieTooltipDesign(typeMap)
             },
@@ -1452,7 +1447,7 @@
             plugins: { 
               centerTextColor,
               centerValueColor,
-              legend: { position: 'bottom', labels: { color: textColor, font: { size: 10, weight: 'bold' } } },
+              legend: { position: 'bottom', labels: { color: textColor, font: { size: 11, weight: 'bold' } } },
               tooltip: pieTooltipDesign(rpMap)
             },
             onClick: (e, elements) => {
@@ -1505,12 +1500,12 @@
       if (!isAuthenticated) {
         return (
           <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4">
-            <div className="w-full max-w-md bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6">
+            <div className="w-full max-w-md bg-slate-900 border border-slate-800 rounded-3xl p-8 shadow-2xl space-y-6">
               <div className="text-center space-y-2">
-                <div className="w-14 h-14 sm:w-16 sm:h-16 bg-blue-600/10 border border-blue-500/30 rounded-2xl flex items-center justify-center mx-auto text-2xl sm:text-3xl">
+                <div className="w-16 h-16 bg-blue-600/10 border border-blue-500/30 rounded-2xl flex items-center justify-center mx-auto text-3xl">
                   🔒
                 </div>
-                <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">Acesso Restrito</h2>
+                <h2 className="text-2xl font-bold text-white tracking-tight">Acesso Restrito</h2>
                 <p className="text-xs text-slate-400">Informe a senha para acessar o Painel de Monitoramento MTur</p>
               </div>
 
@@ -1552,47 +1547,47 @@
       }
 
       return (
-        <div className={`min-h-screen p-3 sm:p-6 lg:p-8 space-y-4 sm:space-y-6 transition-colors duration-300 ${isLightMode ? 'bg-slate-100 text-slate-900' : 'bg-slate-950 text-slate-100'} ${presentationMode ? 'p-2' : ''}`}>
+        <div className={`min-h-screen p-4 sm:p-6 lg:p-8 space-y-6 transition-colors duration-300 ${isLightMode ? 'bg-slate-100 text-slate-900' : 'bg-slate-950 text-slate-100'} ${presentationMode ? 'p-2' : ''}`}>
           
           {/* HEADER PRINCIPAL */}
-          <header className={`flex flex-col lg:flex-row lg:items-center justify-between gap-3 sm:gap-4 border-b pb-3 sm:pb-4 print-card ${isLightMode ? 'border-slate-300' : 'border-slate-800'}`}>
+          <header className={`flex flex-col md:flex-row md:items-center justify-between gap-4 border-b pb-4 print-card ${isLightMode ? 'border-slate-300' : 'border-slate-800'}`}>
             <div>
-              <h1 className="text-xl sm:text-3xl font-extrabold tracking-tight flex flex-wrap items-center gap-2 sm:gap-3">
+              <h1 className="text-3xl font-extrabold tracking-tight flex items-center gap-3">
                 Painel de Monitoramento MTur
-                {presentationMode && <span className="text-[10px] sm:text-xs bg-indigo-600 text-white px-2.5 py-0.5 rounded-full font-bold uppercase animate-pulse">Modo TV / Reunião</span>}
+                {presentationMode && <span className="text-xs bg-indigo-600 text-white px-2.5 py-0.5 rounded-full font-bold uppercase animate-pulse">Modo TV / Reunião</span>}
               </h1>
-              <p className={`text-xs sm:text-sm mt-0.5 ${isLightMode ? 'text-slate-700 font-medium' : 'text-slate-400'}`}>Visão Executiva de Convênios, Termos de Fomento e TEDs</p>
+              <p className={`text-sm mt-0.5 ${isLightMode ? 'text-slate-700 font-medium' : 'text-slate-400'}`}>Visão Executiva de Convênios, Termos de Fomento e TEDs</p>
             </div>
 
-            <div className="flex flex-wrap items-center gap-2 sm:gap-3 no-print">
+            <div className="flex flex-wrap items-center gap-3 no-print">
               <button
                 onClick={() => setIsLightMode(!isLightMode)}
-                className={`px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl text-xs font-bold transition-all border flex items-center gap-1.5 ${isLightMode ? 'bg-white border-slate-300 text-slate-800 hover:bg-slate-50 shadow-sm' : 'bg-slate-900 border-slate-700 text-slate-200 hover:bg-slate-800'}`}
+                className={`px-3 py-2 rounded-xl text-xs font-bold transition-all border flex items-center gap-1.5 ${isLightMode ? 'bg-white border-slate-300 text-slate-800 hover:bg-slate-50 shadow-sm' : 'bg-slate-900 border-slate-700 text-slate-200 hover:bg-slate-800'}`}
               >
-                {isLightMode ? '🌙 Escuro' : '☀️ Claro'}
+                {isLightMode ? '🌙 Modo Escuro' : '☀️ Modo Claro'}
               </button>
 
               <button
                 onClick={() => window.print()}
-                className="px-3 sm:px-4 py-1.5 sm:py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-bold transition-all shadow-md flex items-center gap-1.5"
+                className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-bold transition-all shadow-md flex items-center gap-2"
               >
-                📄 PDF
+                📄 Relatório Executivo PDF
               </button>
 
               <button
                 onClick={() => setPresentationMode(!presentationMode)}
-                className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 border ${
+                className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 border ${
                   presentationMode 
                     ? 'bg-indigo-600 border-indigo-500 text-white shadow-lg' 
                     : isLightMode ? 'bg-white border-slate-300 text-slate-800 shadow-sm' : 'bg-slate-900 border-slate-700 text-slate-300 hover:bg-slate-800'
                 }`}
               >
-                🖥️ {presentationMode ? 'Sair Apresentação' : 'Apresentação (TV)'}
+                🖥️ {presentationMode ? 'Sair do Modo Apresentação' : 'Modo Apresentação (TV)'}
               </button>
 
               {!presentationMode && (
-                <label className="cursor-pointer bg-emerald-600 hover:bg-emerald-500 text-white font-semibold px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl text-xs transition-all shadow-lg flex items-center justify-center gap-1.5">
-                  <span>📂 {fileName ? `Fonte: ${fileName}` : 'Carregar Excel'}</span>
+                <label className="cursor-pointer bg-emerald-600 hover:bg-emerald-500 text-white font-semibold px-4 py-2 rounded-xl text-xs transition-all shadow-lg flex items-center justify-center gap-2">
+                  <span>📂 {fileName ? `Fonte: ${fileName}` : 'Carregar Outro Excel'}</span>
                   <input type="file" accept=".xlsx, .xls" onChange={handleFileUpload} className="hidden" />
                 </label>
               )}
@@ -1600,7 +1595,7 @@
               <button
                 onClick={handleLogout}
                 title="Sair da Sessão"
-                className="px-2.5 sm:px-3 py-1.5 sm:py-2 bg-rose-600/10 border border-rose-500/30 hover:bg-rose-600 text-rose-500 hover:text-white rounded-xl text-xs font-bold transition-all flex items-center gap-1"
+                className="px-3 py-2 bg-rose-600/10 border border-rose-500/30 hover:bg-rose-600 text-rose-500 hover:text-white rounded-xl text-xs font-bold transition-all flex items-center gap-1"
               >
                 🚪 Sair
               </button>
@@ -1608,15 +1603,15 @@
           </header>
 
           {isLoading ? (
-            <div className={`border rounded-3xl p-8 sm:p-12 text-center space-y-4 ${isLightMode ? 'bg-white border-slate-300' : 'bg-slate-900/60 border-slate-800'}`}>
-              <div className="text-3xl sm:text-4xl animate-spin">⏳</div>
-              <h2 className="text-lg sm:text-xl font-bold">Carregando dados da planilha...</h2>
+            <div className={`border rounded-3xl p-12 text-center space-y-4 ${isLightMode ? 'bg-white border-slate-300' : 'bg-slate-900/60 border-slate-800'}`}>
+              <div className="text-4xl animate-spin">⏳</div>
+              <h2 className="text-xl font-bold">Carregando dados da planilha...</h2>
             </div>
           ) : data.length === 0 ? (
-            <div className={`border-2 border-dashed rounded-3xl p-8 sm:p-12 text-center space-y-4 ${isLightMode ? 'bg-white border-slate-300' : 'bg-slate-900/60 border-slate-800'}`}>
-              <div className="text-5xl sm:text-6xl animate-bounce">📊</div>
-              <h2 className="text-xl sm:text-2xl font-bold">Nenhuma Planilha Carregada</h2>
-              <p className={`text-xs sm:text-sm max-w-md mx-auto ${isLightMode ? 'text-slate-700' : 'text-slate-400'}`}>
+            <div className={`border-2 border-dashed rounded-3xl p-12 text-center space-y-4 ${isLightMode ? 'bg-white border-slate-300' : 'bg-slate-900/60 border-slate-800'}`}>
+              <div className="text-6xl animate-bounce">📊</div>
+              <h2 className="text-2xl font-bold">Nenhuma Planilha Carregada</h2>
+              <p className={`text-sm max-w-md mx-auto ${isLightMode ? 'text-slate-700' : 'text-slate-400'}`}>
                 Envie a planilha de dados pelo botão verde superior para alimentar o painel ou certifique-se de que o arquivo no GitHub se chama <strong>Planilha de Emendas - Resumida.xlsx</strong>.
               </p>
             </div>
@@ -1624,21 +1619,21 @@
             <>
               {/* FILTROS PRINCIPAIS */}
               {!presentationMode && (
-                <div className={`border rounded-2xl p-4 sm:p-5 space-y-3 sm:space-y-4 shadow-xl no-print ${isLightMode ? 'bg-white border-slate-300' : 'bg-slate-900 border-slate-800'}`}>
-                  <div className={`flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b pb-3 sm:pb-4 ${isLightMode ? 'border-slate-200' : 'border-slate-700/50'}`}>
-                    <div className={`flex p-1 rounded-xl border overflow-x-auto ${isLightMode ? 'bg-slate-100 border-slate-300' : 'bg-slate-950 border-slate-800'}`}>
+                <div className={`border rounded-2xl p-5 space-y-4 shadow-xl no-print ${isLightMode ? 'bg-white border-slate-300' : 'bg-slate-900 border-slate-800'}`}>
+                  <div className={`flex flex-wrap items-center justify-between gap-4 border-b pb-4 ${isLightMode ? 'border-slate-200' : 'border-slate-700/50'}`}>
+                    <div className={`flex p-1 rounded-xl border ${isLightMode ? 'bg-slate-100 border-slate-300' : 'bg-slate-950 border-slate-800'}`}>
                       {['ALL', 'Convênio', 'Termo de Fomento', 'TED'].map(tab => (
                         <button
                           key={tab}
                           onClick={() => { setFilterTab(tab); setCurrentPage(1); }}
-                          className={`px-3 sm:px-4 py-1.5 rounded-lg text-xs font-bold transition-all whitespace-nowrap ${filterTab === tab ? 'bg-blue-600 text-white shadow-lg' : (isLightMode ? 'text-slate-700 hover:text-black font-semibold' : 'text-slate-400 hover:text-white')}`}
+                          className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${filterTab === tab ? 'bg-blue-600 text-white shadow-lg' : (isLightMode ? 'text-slate-700 hover:text-black font-semibold' : 'text-slate-400 hover:text-white')}`}
                         >
-                          {tab === 'ALL' ? 'Todos Instrumentos' : tab}
+                          {tab === 'ALL' ? 'Todos os Instrumentos' : tab}
                         </button>
                       ))}
                     </div>
 
-                    <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+                    <div className="flex flex-wrap items-center gap-3">
                       <button
                         onClick={handleResetFilters}
                         className={`px-3 py-1.5 border rounded-xl text-xs font-bold transition-all ${isLightMode ? 'bg-slate-100 hover:bg-slate-200 text-slate-800 border-slate-300' : 'bg-slate-800 hover:bg-slate-700 text-slate-300 border-slate-700'}`}
@@ -1648,15 +1643,15 @@
 
                       <input
                         type="text"
-                        placeholder="Buscar proponente, objeto, cidade..."
+                        placeholder="Buscar proponente, objeto, cidade, parlamentar, SEI..."
                         value={search}
                         onChange={(e) => { setSearch(e.target.value); setCurrentPage(1); }}
-                        className={`border rounded-xl px-3 sm:px-4 py-1.5 text-xs focus:outline-none focus:border-blue-500 w-full sm:w-64 font-semibold ${isLightMode ? 'bg-white border-slate-300 text-slate-900' : 'bg-slate-950 border-slate-800 text-white'}`}
+                        className={`border rounded-xl px-4 py-1.5 text-xs focus:outline-none focus:border-blue-500 w-full sm:w-64 font-semibold ${isLightMode ? 'bg-white border-slate-300 text-slate-900' : 'bg-slate-950 border-slate-800 text-white'}`}
                       />
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-8 gap-2.5 sm:gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-8 gap-3">
                     <MultiSelectDropdown
                       title="Parlamentar(es)"
                       options={parlamentaresDisponiveis}
@@ -1731,12 +1726,12 @@
 
               {/* TETO ORÇAMENTÁRIO */}
               <div className={`border rounded-2xl p-4 shadow-xl print-card ${isLightMode ? 'bg-gradient-to-r from-sky-50 via-white to-indigo-50 border-sky-300 text-slate-900' : 'bg-gradient-to-r from-sky-950/60 via-slate-900 to-indigo-950/60 border-sky-800/40 text-slate-100'}`}>
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                   <div>
-                    <div className={`text-[11px] sm:text-xs font-extrabold uppercase tracking-wider ${isLightMode ? 'text-sky-800' : 'text-sky-500'}`}>
+                    <div className={`text-xs font-extrabold uppercase tracking-wider ${isLightMode ? 'text-sky-800' : 'text-sky-500'}`}>
                       Teto Orçamentário MTur ({anoOrcamentoBase})
                     </div>
-                    <div className="text-xl sm:text-2xl font-black mt-0.5">
+                    <div className="text-2xl font-black mt-0.5">
                       {orcamentoAnual > 0 ? fmtR$(orcamentoAnual) : `R$ 0,00 (Sem orçamento base cadastrado)`}
                     </div>
                   </div>
@@ -1757,11 +1752,11 @@
               </div>
 
               {/* CARDS INDICADORES E KPIS */}
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-2.5 sm:gap-3 print-card">
-                <div className={`border rounded-2xl p-3 sm:p-3.5 shadow-lg ${isLightMode ? 'bg-white border-slate-300 text-slate-900' : 'bg-slate-900 border-slate-800'}`}>
-                  <div className={`text-[10px] sm:text-[11px] font-extrabold uppercase tracking-wider ${isLightMode ? 'text-slate-700' : 'text-slate-400'}`}>Volume Global</div>
-                  <div className="text-sm sm:text-base font-black mt-0.5 sm:mt-1 truncate">{fmtR$(totGlobal)}</div>
-                  <div className={`text-[10px] mt-0.5 sm:mt-1 font-semibold ${isLightMode ? 'text-slate-600' : 'text-slate-400'}`}>{filteredData.length} registros</div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-7 gap-3 print-card">
+                <div className={`border rounded-2xl p-3.5 shadow-lg ${isLightMode ? 'bg-white border-slate-300 text-slate-900' : 'bg-slate-900 border-slate-800'}`}>
+                  <div className={`text-[11px] font-extrabold uppercase tracking-wider ${isLightMode ? 'text-slate-700' : 'text-slate-400'}`}>Volume Global</div>
+                  <div className="text-base font-black mt-1">{fmtR$(totGlobal)}</div>
+                  <div className={`text-[10px] mt-1 font-semibold ${isLightMode ? 'text-slate-600' : 'text-slate-400'}`}>{filteredData.length} registros</div>
                 </div>
 
                 <div 
@@ -1772,16 +1767,16 @@
                     setFilterNaoEmpenhados(false);
                     setCurrentPage(1); 
                   }}
-                  className={`border rounded-2xl p-3 sm:p-3.5 shadow-lg hover:shadow-xl transition-all cursor-pointer hover:scale-[1.02] ${filterEmpenhados ? 'ring-2 ring-amber-500' : ''} ${isLightMode ? 'bg-amber-50/70 border-amber-300 hover:bg-amber-100/80' : 'bg-amber-950/20 border-amber-900/40 hover:bg-amber-950/40'}`}
+                  className={`border rounded-2xl p-3.5 shadow-lg hover:shadow-xl transition-all cursor-pointer hover:scale-[1.02] ${filterEmpenhados ? 'ring-2 ring-amber-500' : ''} ${isLightMode ? 'bg-amber-50/70 border-amber-300 hover:bg-amber-100/80' : 'bg-amber-950/20 border-amber-900/40 hover:bg-amber-950/40'}`}
                 >
-                  <div className={`text-[10px] sm:text-[11px] font-black uppercase tracking-wider flex items-center justify-between ${isLightMode ? 'text-amber-900' : 'text-amber-500'}`}>
+                  <div className={`text-[11px] font-black uppercase tracking-wider flex items-center justify-between ${isLightMode ? 'text-amber-900' : 'text-amber-500'}`}>
                     <span>Total Empenhado</span>
-                    {filterEmpenhados && <span className="text-[8px] sm:text-[9px] bg-amber-500 text-black px-1 py-0.5 rounded font-black">Ativo</span>}
+                    {filterEmpenhados && <span className="text-[9px] bg-amber-500 text-black px-1.5 py-0.5 rounded font-black">Ativo</span>}
                   </div>
-                  <div className={`text-sm sm:text-base font-black mt-0.5 sm:mt-1 truncate ${isLightMode ? 'text-amber-950' : 'text-amber-500'}`}>{fmtR$(totEmpenho)}</div>
-                  <div className="text-[9px] sm:text-[10px] mt-0.5 sm:mt-1 flex justify-between items-center font-semibold">
+                  <div className={`text-base font-black mt-1 ${isLightMode ? 'text-amber-950' : 'text-amber-500'}`}>{fmtR$(totEmpenho)}</div>
+                  <div className="text-[10px] mt-1 flex justify-between items-center font-semibold">
                     <span className={isLightMode ? 'text-slate-700' : 'text-slate-400'}>Empenhos válidos</span>
-                    <span className={`font-black ${isLightMode ? 'text-amber-900' : 'text-amber-400'}`}>Filtrar 🔍</span>
+                    <span className={`font-black text-[9px] ${isLightMode ? 'text-amber-900' : 'text-amber-400'}`}>Filtrar 🔍</span>
                   </div>
                 </div>
 
@@ -1793,16 +1788,16 @@
                     setFilterRepassados(false); 
                     setCurrentPage(1); 
                   }}
-                  className={`border rounded-2xl p-3 sm:p-3.5 shadow-lg hover:shadow-xl transition-all cursor-pointer hover:scale-[1.02] ${filterNaoEmpenhados ? 'ring-2 ring-purple-500' : ''} ${isLightMode ? 'bg-purple-50/70 border-purple-300 hover:bg-purple-100/80' : 'bg-purple-950/20 border-purple-900/40 hover:bg-purple-950/40'}`}
+                  className={`border rounded-2xl p-3.5 shadow-lg hover:shadow-xl transition-all cursor-pointer hover:scale-[1.02] ${filterNaoEmpenhados ? 'ring-2 ring-purple-500' : ''} ${isLightMode ? 'bg-purple-50/70 border-purple-300 hover:bg-purple-100/80' : 'bg-purple-950/20 border-purple-900/40 hover:bg-purple-950/40'}`}
                 >
-                  <div className={`text-[10px] sm:text-[11px] font-black uppercase tracking-wider flex items-center justify-between ${isLightMode ? 'text-purple-900' : 'text-purple-400'}`}>
+                  <div className={`text-[11px] font-black uppercase tracking-wider flex items-center justify-between ${isLightMode ? 'text-purple-900' : 'text-purple-400'}`}>
                     <span>Não Empenhado</span>
-                    {filterNaoEmpenhados && <span className="text-[8px] sm:text-[9px] bg-purple-600 text-white px-1 py-0.5 rounded font-black">Ativo</span>}
+                    {filterNaoEmpenhados && <span className="text-[9px] bg-purple-600 text-white px-1.5 py-0.5 rounded font-black">Ativo</span>}
                   </div>
-                  <div className={`text-sm sm:text-base font-black mt-0.5 sm:mt-1 truncate ${isLightMode ? 'text-purple-950' : 'text-purple-400'}`}>{fmtR$(totNaoEmpenhado)}</div>
-                  <div className="text-[9px] sm:text-[10px] mt-0.5 sm:mt-1 flex justify-between items-center font-semibold">
+                  <div className={`text-base font-black mt-1 ${isLightMode ? 'text-purple-950' : 'text-purple-400'}`}>{fmtR$(totNaoEmpenhado)}</div>
+                  <div className="text-[10px] mt-1 flex justify-between items-center font-semibold">
                     <span className={isLightMode ? 'text-slate-700' : 'text-slate-400'}>Global - Empenhado</span>
-                    <span className={`font-black ${isLightMode ? 'text-purple-900' : 'text-purple-400'}`}>Filtrar 🔍</span>
+                    <span className={`font-black text-[9px] ${isLightMode ? 'text-purple-900' : 'text-purple-400'}`}>Filtrar 🔍</span>
                   </div>
                 </div>
 
@@ -1814,22 +1809,22 @@
                     setFilterNaoEmpenhados(false);
                     setCurrentPage(1); 
                   }}
-                  className={`border rounded-2xl p-3 sm:p-3.5 shadow-lg hover:shadow-xl transition-all cursor-pointer hover:scale-[1.02] ${filterRepassados ? 'ring-2 ring-emerald-500' : ''} ${isLightMode ? 'bg-emerald-50/70 border-emerald-300 hover:bg-emerald-100/80' : 'bg-emerald-950/20 border-emerald-900/40 hover:bg-emerald-950/40'}`}
+                  className={`border rounded-2xl p-3.5 shadow-lg hover:shadow-xl transition-all cursor-pointer hover:scale-[1.02] ${filterRepassados ? 'ring-2 ring-emerald-500' : ''} ${isLightMode ? 'bg-emerald-50/70 border-emerald-300 hover:bg-emerald-100/80' : 'bg-emerald-950/20 border-emerald-900/40 hover:bg-emerald-950/40'}`}
                 >
-                  <div className={`text-[10px] sm:text-[11px] font-black uppercase tracking-wider flex items-center justify-between ${isLightMode ? 'text-emerald-900' : 'text-emerald-500'}`}>
+                  <div className={`text-[11px] font-black uppercase tracking-wider flex items-center justify-between ${isLightMode ? 'text-emerald-900' : 'text-emerald-500'}`}>
                     <span>Total Repassado</span>
-                    {filterRepassados && <span className="text-[8px] sm:text-[9px] bg-emerald-600 text-white px-1 py-0.5 rounded font-black">Ativo</span>}
+                    {filterRepassados && <span className="text-[9px] bg-emerald-600 text-white px-1.5 py-0.5 rounded font-black">Ativo</span>}
                   </div>
-                  <div className={`text-sm sm:text-base font-black mt-0.5 sm:mt-1 truncate ${isLightMode ? 'text-emerald-950' : 'text-emerald-500'}`}>{fmtR$(totRepassado)}</div>
-                  <div className="text-[9px] sm:text-[10px] mt-0.5 sm:mt-1 flex justify-between items-center font-semibold">
+                  <div className={`text-base font-black mt-1 ${isLightMode ? 'text-emerald-950' : 'text-emerald-500'}`}>{fmtR$(totRepassado)}</div>
+                  <div className="text-[10px] mt-1 flex justify-between items-center font-semibold">
                     <span className={isLightMode ? 'text-slate-700' : 'text-slate-400'}>Recursos pagos</span>
-                    <span className={`font-black ${isLightMode ? 'text-emerald-900' : 'text-emerald-400'}`}>Filtrar 🔍</span>
+                    <span className={`font-black text-[9px] ${isLightMode ? 'text-emerald-900' : 'text-emerald-400'}`}>Filtrar 🔍</span>
                   </div>
                 </div>
 
-                <div className={`border rounded-2xl p-3 sm:p-3.5 shadow-lg ${isLightMode ? 'bg-white border-slate-300 text-slate-900' : 'bg-slate-900 border-slate-800'}`}>
-                  <div className={`text-[10px] sm:text-[11px] font-extrabold uppercase tracking-wider ${isLightMode ? 'text-indigo-800' : 'text-slate-400'}`}>% Execução</div>
-                  <div className={`text-sm sm:text-base font-black mt-0.5 sm:mt-1 ${isLightMode ? 'text-indigo-900' : 'text-indigo-500'}`}>{pctExecucaoEmpenho}%</div>
+                <div className={`border rounded-2xl p-3.5 shadow-lg ${isLightMode ? 'bg-white border-slate-300 text-slate-900' : 'bg-slate-900 border-slate-800'}`}>
+                  <div className={`text-[11px] font-extrabold uppercase tracking-wider ${isLightMode ? 'text-indigo-800' : 'text-slate-400'}`}>% Execução</div>
+                  <div className={`text-base font-black mt-1 ${isLightMode ? 'text-indigo-900' : 'text-indigo-500'}`}>{pctExecucaoEmpenho}%</div>
                   <div className="w-full bg-slate-200 h-1.5 rounded-full mt-1.5 overflow-hidden">
                     <div className="bg-indigo-600 h-full" style={{ width: `${Math.min(pctExecucaoEmpenho, 100)}%` }}></div>
                   </div>
@@ -1843,31 +1838,31 @@
                     setFilterNaoEmpenhados(false);
                     setCurrentPage(1); 
                   }}
-                  className={`border rounded-2xl p-3 sm:p-3.5 shadow-lg hover:shadow-xl transition-all cursor-pointer hover:scale-[1.02] ${filterFaltaRepassar ? 'ring-2 ring-rose-600' : ''} ${isLightMode ? 'bg-rose-50 border-rose-300 hover:bg-rose-100/80' : 'bg-rose-950/20 border-rose-900/40 hover:bg-rose-950/40'}`}
+                  className={`border rounded-2xl p-3.5 shadow-lg hover:shadow-xl transition-all cursor-pointer hover:scale-[1.02] ${filterFaltaRepassar ? 'ring-2 ring-rose-600' : ''} ${isLightMode ? 'bg-rose-50 border-rose-300 hover:bg-rose-100/80' : 'bg-rose-950/20 border-rose-900/40 hover:bg-rose-950/40'}`}
                 >
-                  <div className={`text-[10px] sm:text-[11px] font-black uppercase tracking-wider flex items-center justify-between ${isLightMode ? 'text-rose-900' : 'text-rose-500'}`}>
+                  <div className={`text-[11px] font-black uppercase tracking-wider flex items-center justify-between ${isLightMode ? 'text-rose-900' : 'text-rose-500'}`}>
                     <span>Falta Repassar</span>
-                    {filterFaltaRepassar && <span className="text-[8px] sm:text-[9px] bg-rose-600 text-white px-1 py-0.5 rounded font-black">Ativo</span>}
+                    {filterFaltaRepassar && <span className="text-[9px] bg-rose-600 text-white px-1.5 py-0.5 rounded font-black">Ativo</span>}
                   </div>
-                  <div className={`text-sm sm:text-base font-black mt-0.5 sm:mt-1 truncate ${isLightMode ? 'text-rose-950' : 'text-rose-500'}`}>{fmtR$(totFaltaRepassar)}</div>
-                  <div className="text-[9px] sm:text-[10px] mt-0.5 sm:mt-1 flex justify-between items-center font-semibold">
+                  <div className={`text-base font-black mt-1 ${isLightMode ? 'text-rose-950' : 'text-rose-500'}`}>{fmtR$(totFaltaRepassar)}</div>
+                  <div className="text-[10px] mt-1 flex justify-between items-center font-semibold">
                     <span className={isLightMode ? 'text-slate-700' : 'text-slate-400'}>Empenhado - Pago</span>
-                    <span className={`font-black ${isLightMode ? 'text-rose-900' : 'text-rose-400'}`}>Filtrar 🔍</span>
+                    <span className={`font-black text-[9px] ${isLightMode ? 'text-rose-900' : 'text-rose-400'}`}>Filtrar 🔍</span>
                   </div>
                 </div>
 
                 <div 
                   onClick={() => { setFilterVigenciaAlerta(filterVigenciaAlerta === 'ALERTA' ? 'ALL' : 'ALERTA'); setCurrentPage(1); }}
-                  className={`border rounded-2xl p-3 sm:p-3.5 shadow-lg flex flex-col justify-between cursor-pointer transition-all hover:scale-[1.02] col-span-2 sm:col-span-1 ${filterVigenciaAlerta === 'ALERTA' ? 'ring-2 ring-amber-500' : ''} ${isLightMode ? 'bg-amber-50 border-amber-300 hover:bg-amber-100/90' : 'bg-amber-950/20 border-amber-900/50 hover:bg-amber-950/40'}`}
+                  className={`border rounded-2xl p-3.5 shadow-lg flex flex-col justify-between cursor-pointer transition-all hover:scale-[1.02] ${filterVigenciaAlerta === 'ALERTA' ? 'ring-2 ring-amber-500' : ''} ${isLightMode ? 'bg-amber-50 border-amber-300 hover:bg-amber-100/90' : 'bg-amber-950/20 border-amber-900/50 hover:bg-amber-950/40'}`}
                 >
                   <div>
-                    <div className={`text-[10px] sm:text-[11px] font-black uppercase tracking-wider flex items-center justify-between ${isLightMode ? 'text-amber-900' : 'text-amber-500'}`}>
+                    <div className={`text-[11px] font-black uppercase tracking-wider flex items-center justify-between ${isLightMode ? 'text-amber-900' : 'text-amber-500'}`}>
                       <span>Vigências {currentYear}</span>
-                      {filterVigenciaAlerta === 'ALERTA' && <span className="text-[8px] sm:text-[9px] bg-amber-500 text-black px-1 py-0.5 rounded font-black">Ativo</span>}
+                      {filterVigenciaAlerta === 'ALERTA' && <span className="text-[9px] bg-amber-500 text-black px-1.5 py-0.5 rounded font-black">Ativo</span>}
                     </div>
                     <div className="flex items-baseline gap-1.5 mt-0.5">
-                      <span className={`text-sm sm:text-base font-black ${isLightMode ? 'text-amber-950' : 'text-amber-500'}`}>{totalAlertasVigencia}</span>
-                      <span className={`text-[9px] sm:text-[10px] font-bold ${isLightMode ? 'text-slate-700' : 'text-slate-400'}`}>no ano</span>
+                      <span className={`text-base font-black ${isLightMode ? 'text-amber-950' : 'text-amber-500'}`}>{totalAlertasVigencia}</span>
+                      <span className={`text-[10px] font-bold ${isLightMode ? 'text-slate-700' : 'text-slate-400'}`}>no ano</span>
                     </div>
                   </div>
 
@@ -1877,7 +1872,7 @@
                       className={`border rounded-lg p-0.5 text-center transition-all ${filterVigenciaAlerta === '30' ? 'bg-rose-600 text-white border-rose-500' : (isLightMode ? 'bg-rose-100 border-rose-300' : 'bg-rose-950/20 border-rose-500/30')}`}
                     >
                       <span className={`block text-[8px] font-extrabold ${isLightMode && filterVigenciaAlerta !== '30' ? 'text-rose-900' : 'text-rose-400'}`}>30d</span>
-                      <span className={`text-[9px] font-extrabold ${isLightMode && filterVigenciaAlerta !== '30' ? 'text-rose-950' : 'text-rose-300'}`}>{vencendo30}</span>
+                      <span className={`text-[10px] font-extrabold ${isLightMode && filterVigenciaAlerta !== '30' ? 'text-rose-950' : 'text-rose-300'}`}>{vencendo30}</span>
                     </button>
 
                     <button
@@ -1885,7 +1880,7 @@
                       className={`border rounded-lg p-0.5 text-center transition-all ${filterVigenciaAlerta === '60' ? 'bg-amber-600 text-white border-amber-500' : (isLightMode ? 'bg-amber-100 border-amber-300' : 'bg-amber-950/20 border-amber-500/30')}`}
                     >
                       <span className={`block text-[8px] font-extrabold ${isLightMode && filterVigenciaAlerta !== '60' ? 'text-amber-900' : 'text-amber-400'}`}>60d</span>
-                      <span className={`text-[9px] font-extrabold ${isLightMode && filterVigenciaAlerta !== '60' ? 'text-amber-950' : 'text-amber-300'}`}>{vencendo60}</span>
+                      <span className={`text-[10px] font-extrabold ${isLightMode && filterVigenciaAlerta !== '60' ? 'text-amber-950' : 'text-amber-300'}`}>{vencendo60}</span>
                     </button>
 
                     <button
@@ -1893,17 +1888,17 @@
                       className={`border rounded-lg p-0.5 text-center transition-all ${filterVigenciaAlerta === '90' ? 'bg-sky-600 text-white border-sky-500' : (isLightMode ? 'bg-sky-100 border-sky-300' : 'bg-sky-950/20 border-sky-500/30')}`}
                     >
                       <span className={`block text-[8px] font-extrabold ${isLightMode && filterVigenciaAlerta !== '90' ? 'text-sky-900' : 'text-sky-400'}`}>90d</span>
-                      <span className={`text-[9px] font-extrabold ${isLightMode && filterVigenciaAlerta !== '90' ? 'text-sky-950' : 'text-sky-300'}`}>{vencendo90}</span>
+                      <span className={`text-[10px] font-extrabold ${isLightMode && filterVigenciaAlerta !== '90' ? 'text-sky-950' : 'text-sky-300'}`}>{vencendo90}</span>
                     </button>
                   </div>
                 </div>
               </div>
 
               {/* SEÇÃO DE MAPA E GRÁFICOS ORGANIZADOS */}
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 
                 {/* MAPA BRASIL */}
-                <div className={`border rounded-2xl p-4 sm:p-5 shadow-lg flex flex-col justify-between print-card ${isLightMode ? 'bg-white border-slate-300' : 'bg-slate-900 border-slate-800'}`}>
+                <div className={`border rounded-2xl p-5 shadow-lg flex flex-col justify-between print-card ${isLightMode ? 'bg-white border-slate-300' : 'bg-slate-900 border-slate-800'}`}>
                   <div className="flex items-center justify-between mb-2">
                     <h3 className={`text-xs font-black uppercase tracking-wider ${isLightMode ? 'text-slate-900' : 'text-slate-300'}`}>Mapa de Distribuição (UF)</h3>
                     <div className="flex items-center gap-2 no-print">
@@ -1914,12 +1909,12 @@
                         onClick={() => setExpandedItem({ isMap: true, title: "Mapa de Distribuição por UF", mapProps: { selectedUFs, onToggleUF: handleToggleUFMap, ufData: ufDataMap } })}
                         className={`text-[10px] px-2 py-1 rounded-lg transition-all font-bold ${isLightMode ? 'bg-slate-100 text-blue-800 hover:bg-slate-200 border border-slate-300' : 'bg-slate-800 text-blue-400 hover:bg-slate-700'}`}
                       >
-                        🔍 Expandir
+                        🔍 Expandir / Imprimir
                       </button>
                     </div>
                   </div>
                   <BrazilMapSVG selectedUFs={selectedUFs} onToggleUF={handleToggleUFMap} ufData={ufDataMap} isLightMode={isLightMode} />
-                  <p className={`text-[10px] sm:text-[11px] text-center mt-2 sm:mt-3 font-semibold no-print ${isLightMode ? 'text-slate-600' : 'text-slate-400'}`}>Clique em qualquer estado para filtrar a lista.</p>
+                  <p className={`text-[11px] text-center mt-3 font-semibold no-print ${isLightMode ? 'text-slate-600' : 'text-slate-400'}`}>Clique em qualquer estado para filtrar a lista.</p>
                 </div>
 
                 {/* PAINEL DE GRÁFICOS LADO A LADO */}
@@ -1934,11 +1929,11 @@
                           onClick={() => setExpandedItem({ isMap: false, title: chartConfigs.uf.title, chartConfig: chartConfigs.uf.config })}
                           className={`text-[10px] px-2 py-1 rounded-lg transition-all font-bold no-print ${isLightMode ? 'bg-slate-100 text-blue-800 hover:bg-slate-200 border border-slate-300' : 'bg-slate-800 text-blue-400 hover:bg-slate-700'}`}
                         >
-                          🔍 Expandir
+                          🔍 Expandir / Imprimir
                         </button>
                       )}
                     </div>
-                    <div className="h-48 sm:h-52 relative"><canvas ref={chartUfRef}></canvas></div>
+                    <div className="h-52 relative"><canvas ref={chartUfRef}></canvas></div>
                   </div>
 
                   {/* LINHA 2: TOP 5 PROGRAMAS E TOP 5 PARLAMENTARES LADO A LADO */}
@@ -1950,11 +1945,11 @@
                           onClick={() => setExpandedItem({ isMap: false, title: chartConfigs.program.title, chartConfig: chartConfigs.program.config })}
                           className={`text-[10px] px-2 py-1 rounded-lg transition-all font-bold no-print ${isLightMode ? 'bg-slate-100 text-blue-800 hover:bg-slate-200 border border-slate-300' : 'bg-slate-800 text-blue-400 hover:bg-slate-700'}`}
                         >
-                          🔍 Expandir
+                          🔍 Expandir / Imprimir
                         </button>
                       )}
                     </div>
-                    <div className="h-44 sm:h-48 relative"><canvas ref={chartProgramRef}></canvas></div>
+                    <div className="h-48 relative"><canvas ref={chartProgramRef}></canvas></div>
                   </div>
 
                   <div className={`border rounded-2xl p-4 shadow-lg flex flex-col justify-between print-card ${isLightMode ? 'bg-white border-slate-300' : 'bg-slate-900 border-slate-800'}`}>
@@ -1965,11 +1960,11 @@
                           onClick={() => setExpandedItem({ isMap: false, title: chartConfigs.parlamentar.title, chartConfig: chartConfigs.parlamentar.config })}
                           className={`text-[10px] px-2 py-1 rounded-lg transition-all font-bold no-print ${isLightMode ? 'bg-slate-100 text-blue-800 hover:bg-slate-200 border border-slate-300' : 'bg-slate-800 text-blue-400 hover:bg-slate-700'}`}
                         >
-                          🔍 Expandir
+                          🔍 Expandir / Imprimir
                         </button>
                       )}
                     </div>
-                    <div className="h-44 sm:h-48 relative"><canvas ref={chartParlamentarRef}></canvas></div>
+                    <div className="h-48 relative"><canvas ref={chartParlamentarRef}></canvas></div>
                   </div>
 
                   {/* LINHA 3: OS DOIS GRÁFICOS DE PIZZA/ROSCA LADO A LADO NA PARTE INFERIOR */}
@@ -1981,11 +1976,11 @@
                           onClick={() => setExpandedItem({ isMap: false, title: chartConfigs.type.title, chartConfig: chartConfigs.type.config })}
                           className={`text-[10px] px-2 py-1 rounded-lg transition-all font-bold no-print ${isLightMode ? 'bg-slate-100 text-blue-800 hover:bg-slate-200 border border-slate-300' : 'bg-slate-800 text-blue-400 hover:bg-slate-700'}`}
                         >
-                          🔍 Expandir
+                          🔍 Expandir / Imprimir
                         </button>
                       )}
                     </div>
-                    <div className="h-44 sm:h-48 relative">
+                    <div className="h-48 relative">
                       <canvas ref={chartTypeRef}></canvas>
                     </div>
                   </div>
@@ -1998,11 +1993,11 @@
                           onClick={() => setExpandedItem({ isMap: false, title: chartConfigs.rp.title, chartConfig: chartConfigs.rp.config })}
                           className={`text-[10px] px-2 py-1 rounded-lg transition-all font-bold no-print ${isLightMode ? 'bg-slate-100 text-blue-800 hover:bg-slate-200 border border-slate-300' : 'bg-slate-800 text-blue-400 hover:bg-slate-700'}`}
                         >
-                          🔍 Expandir
+                          🔍 Expandir / Imprimir
                         </button>
                       )}
                     </div>
-                    <div className="h-44 sm:h-48 relative">
+                    <div className="h-48 relative">
                       <canvas ref={chartRpRef}></canvas>
                     </div>
                   </div>
@@ -2012,37 +2007,37 @@
 
               {/* TABELA DE DADOS COM CORES DE ALTO CONTRASTE NO MODO CLARO */}
               <div className={`border rounded-2xl overflow-hidden shadow-xl print-card print-page-break-before ${isLightMode ? 'bg-white border-slate-300' : 'bg-slate-900 border-slate-800'}`}>
-                <div className={`p-3 sm:p-4 border-b flex flex-col sm:flex-row justify-between items-center gap-3 ${isLightMode ? 'border-slate-300 bg-slate-50' : 'border-slate-800'}`}>
-                  <h3 className={`text-xs font-black uppercase tracking-wider flex items-center gap-2 flex-wrap ${isLightMode ? 'text-slate-900' : 'text-slate-300'}`}>
+                <div className={`p-4 border-b flex flex-col sm:flex-row justify-between items-center gap-3 ${isLightMode ? 'border-slate-300 bg-slate-50' : 'border-slate-800'}`}>
+                  <h3 className={`text-xs font-black uppercase tracking-wider flex items-center gap-2 ${isLightMode ? 'text-slate-900' : 'text-slate-300'}`}>
                     <span>Detalhamento dos Instrumentos ({sortedData.length})</span>
                     {filterFaltaRepassar && (
-                      <span className="bg-rose-600 text-white text-[9px] sm:text-[10px] px-2 py-0.5 rounded-full font-extrabold shadow-sm">
+                      <span className="bg-rose-600 text-white text-[10px] px-2 py-0.5 rounded-full font-extrabold shadow-sm">
                         Pendentes de Repasse
                       </span>
                     )}
                     {filterEmpenhados && (
-                      <span className="bg-amber-600 text-white text-[9px] sm:text-[10px] px-2 py-0.5 rounded-full font-extrabold shadow-sm">
+                      <span className="bg-amber-600 text-white text-[10px] px-2 py-0.5 rounded-full font-extrabold shadow-sm">
                         Empenhados
                       </span>
                     )}
                     {filterNaoEmpenhados && (
-                      <span className="bg-purple-600 text-white text-[9px] sm:text-[10px] px-2 py-0.5 rounded-full font-extrabold shadow-sm">
+                      <span className="bg-purple-600 text-white text-[10px] px-2 py-0.5 rounded-full font-extrabold shadow-sm">
                         Não Empenhados
                       </span>
                     )}
                     {filterRepassados && (
-                      <span className="bg-emerald-600 text-white text-[9px] sm:text-[10px] px-2 py-0.5 rounded-full font-extrabold shadow-sm">
+                      <span className="bg-emerald-600 text-white text-[10px] px-2 py-0.5 rounded-full font-extrabold shadow-sm">
                         Repassados
                       </span>
                     )}
                   </h3>
 
-                  <div className="flex items-center gap-3 text-xs w-full sm:w-auto justify-between sm:justify-end no-print">
+                  <div className="flex items-center gap-3 text-xs no-print">
                     <button
                       onClick={handleExportExcel}
                       className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-3 py-1.5 rounded-xl transition-all shadow-md flex items-center gap-1.5"
                     >
-                      📥 Excel
+                      📥 Exportar Excel
                     </button>
 
                     <div className={`flex items-center gap-1.5 font-bold ${isLightMode ? 'text-slate-700' : 'text-slate-400'}`}>
@@ -2171,34 +2166,73 @@
                 </div>
 
                 {/* PAGINAÇÃO */}
-                <div className={`p-3 sm:p-4 border-t flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4 no-print ${isLightMode ? 'border-slate-300 bg-slate-50' : 'border-slate-800'}`}>
+                <div className={`p-4 border-t flex flex-col sm:flex-row items-center justify-between gap-4 no-print ${isLightMode ? 'border-slate-300 bg-slate-50' : 'border-slate-800'}`}>
                   <div className={`text-xs font-bold ${isLightMode ? 'text-slate-700' : 'text-slate-400'}`}>
                     Página <span className={`font-black ${isLightMode ? 'text-blue-900' : 'text-blue-500'}`}>{currentPage}</span> de <span className={`font-black ${isLightMode ? 'text-blue-900' : 'text-blue-500'}`}>{totalPages}</span>
                   </div>
 
-                  <div className="flex items-center gap-1.5 sm:gap-2">
+                  <div className="flex items-center gap-2">
                     <button
                       disabled={currentPage === 1}
                       onClick={() => setCurrentPage(1)}
-                      className={`px-2 sm:px-2.5 py-1 text-xs font-bold rounded-lg disabled:opacity-40 ${isLightMode ? 'bg-slate-200 text-slate-800 hover:bg-slate-300 border border-slate-300' : 'bg-slate-800 text-slate-200 hover:bg-slate-700'}`}
+                      className={`px-2.5 py-1 text-xs font-bold rounded-lg disabled:opacity-40 ${isLightMode ? 'bg-slate-200 text-slate-800 hover:bg-slate-300 border border-slate-300' : 'bg-slate-800 text-slate-200 hover:bg-slate-700'}`}
                     >
-                      «
+                      « Primeiros
                     </button>
                     <button
                       disabled={currentPage === 1}
                       onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-                      className={`px-2.5 sm:px-3 py-1 text-xs font-bold rounded-lg disabled:opacity-40 ${isLightMode ? 'bg-slate-200 text-slate-800 hover:bg-slate-300 border border-slate-300' : 'bg-slate-800 text-slate-200 hover:bg-slate-700'}`}
+                      className={`px-3 py-1 text-xs font-bold rounded-lg disabled:opacity-40 ${isLightMode ? 'bg-slate-200 text-slate-800 hover:bg-slate-300 border border-slate-300' : 'bg-slate-800 text-slate-200 hover:bg-slate-700'}`}
                     >
                       ‹ Anterior
                     </button>
                     <button
                       disabled={currentPage === totalPages}
                       onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-                      className={`px-2.5 sm:px-3 py-1 text-xs font-bold rounded-lg disabled:opacity-40 ${isLightMode ? 'bg-slate-200 text-slate-800 hover:bg-slate-300 border border-slate-300' : 'bg-slate-800 text-slate-200 hover:bg-slate-700'}`}
+                      className={`px-3 py-1 text-xs font-bold rounded-lg disabled:opacity-40 ${isLightMode ? 'bg-slate-200 text-slate-800 hover:bg-slate-300 border border-slate-300' : 'bg-slate-800 text-slate-200 hover:bg-slate-700'}`}
                     >
                       Próxima ›
                     </button>
                     <button
                       disabled={currentPage === totalPages}
                       onClick={() => setCurrentPage(totalPages)}
-                      className={`px-2 sm:px-2.5 py-1 text-xs font-bold rounded-lg disabled
+                      className={`px-2.5 py-1 text-xs font-bold rounded-lg disabled:opacity-40 ${isLightMode ? 'bg-slate-200 text-slate-800 hover:bg-slate-300 border border-slate-300' : 'bg-slate-800 text-slate-200 hover:bg-slate-700'}`}
+                    >
+                      Última »
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
+
+          {/* MODAL DE DADOS/GRÁFICOS EXPANDIDOS */}
+          {expandedItem && (
+            <ExpandedChartModal
+              title={expandedItem.title}
+              chartConfig={expandedItem.chartConfig}
+              isMap={expandedItem.isMap}
+              mapProps={expandedItem.mapProps}
+              onClose={() => setExpandedItem(null)}
+              isLightMode={isLightMode}
+            />
+          )}
+
+          {/* FICHA EXECUTIVA DO INSTRUMENTO AO CLICAR NA TABELA */}
+          {selectedInstrument && (
+            <InstrumentDetailModal
+              item={selectedInstrument}
+              onClose={() => setSelectedInstrument(null)}
+              isLightMode={isLightMode}
+              riskStatus={getRiskStatus(selectedInstrument)}
+            />
+          )}
+
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>
