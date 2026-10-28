@@ -626,7 +626,18 @@
       const [fileName, setFileName] = useState('');
       const [isLoading, setIsLoading] = useState(false);
       
-      const [isLightMode, setIsLightMode] = useState(false);
+      // MELHORIA 1: PERSISTÊNCIA DO TEMA CLARO/ESCURO COM LOCALSTORAGE
+      const [isLightMode, setIsLightMode] = useState(() => {
+        return localStorage.getItem('mtur_theme') === 'light';
+      });
+
+      const toggleTheme = () => {
+        setIsLightMode(prev => {
+          const newMode = !prev;
+          localStorage.setItem('mtur_theme', newMode ? 'light' : 'dark');
+          return newMode;
+        });
+      };
 
       const [filterTab, setFilterTab] = useState('ALL');
       const [filterAno, setFilterAno] = useState('ALL');
@@ -830,7 +841,7 @@
         setFileName(sourceName);
       };
 
-// CARREGAMENTO INICIAL AUTOMÁTICO VIA API DA VERCEL
+      // CARREGAMENTO INICIAL AUTOMÁTICO VIA API DA VERCEL
       useEffect(() => {
         if (!isAuthenticated) return;
 
@@ -883,6 +894,7 @@
 
         loadDefaultSheet();
       }, [isAuthenticated]);
+
       // LOGIN SEGURO VIA API DA VERCEL
       const handleLogin = async (e) => {
         e.preventDefault();
@@ -1209,6 +1221,40 @@
       const rpsDisponiveis = useMemo(() => Array.from(new Set(data.map(d => d.rp).filter(Boolean))).sort(), [data]);
       const programasDisponiveis = useMemo(() => Array.from(new Set(data.map(d => d.codPrograma).filter(p => p && p !== '-'))).sort(), [data]);
       const parlamentaresDisponiveis = useMemo(() => Array.from(new Set(data.map(d => d.parlamentar).filter(p => p && p !== '-'))).sort(), [data]);
+
+      // MELHORIA 2: IDENTIFICAÇÃO DE FILTROS ATIVOS PARA A BARRA VISUAL
+      const activeFiltersList = useMemo(() => {
+        const list = [];
+        if (filterTab !== 'ALL') list.type = 'tab';
+        if (filterAno !== 'ALL') list.push({ key: 'ano', label: `Ano Celebração: ${filterAno}`, clear: () => setFilterAno('ALL') });
+        if (filterAnoRepasse !== 'ALL') list.push({ key: 'anoRepasse', label: `Ano Repasse: ${filterAnoRepasse}`, clear: () => setFilterAnoRepasse('ALL') });
+        if (filterRP !== 'ALL') list.push({ key: 'rp', label: `Modalidade: ${filterRP}`, clear: () => setFilterRP('ALL') });
+        if (filterFaixaValor !== 'ALL') {
+          const lbl = filterFaixaValor === '500K' ? 'Até R$ 500 mil' : filterFaixaValor === '500K_2M' ? 'R$ 500k a R$ 2 mi' : 'Acima R$ 2 mi';
+          list.push({ key: 'faixa', label: `Valor: ${lbl}`, clear: () => setFilterFaixaValor('ALL') });
+        }
+        if (filterVigenciaAlerta !== 'ALL') {
+          const lbl = filterVigenciaAlerta === 'ALERTA' ? `Ano ${currentYear}` : `Até ${filterVigenciaAlerta} dias`;
+          list.push({ key: 'vigencia', label: `Vigência: ${lbl}`, clear: () => setFilterVigenciaAlerta('ALL') });
+        }
+        if (filterEmpenhados) list.push({ key: 'empenhados', label: 'Apenas Empenhados', clear: () => setFilterEmpenhados(false) });
+        if (filterNaoEmpenhados) list.push({ key: 'naoEmpenhados', label: 'Apenas Não Empenhados', clear: () => setFilterNaoEmpenhados(false) });
+        if (filterRepassados) list.push({ key: 'repassados', label: 'Apenas Repassados', clear: () => setFilterRepassados(false) });
+        if (filterFaltaRepassar) list.push({ key: 'faltaRepassar', label: 'Apenas Pendentes de Repasse', clear: () => setFilterFaltaRepassar(false) });
+        if (search) list.push({ key: 'search', label: `Busca: "${search}"`, clear: () => setSearch('') });
+
+        selectedUFs.forEach(uf => {
+          list.push({ key: `uf-${uf}`, label: `UF: ${uf}`, clear: () => setSelectedUFs(selectedUFs.filter(u => u !== uf)) });
+        });
+        selectedProgramas.forEach(p => {
+          list.push({ key: `prog-${p}`, label: `Programa: ${p}`, clear: () => setSelectedProgramas(selectedProgramas.filter(item => item !== p)) });
+        });
+        selectedParlamentares.forEach(parl => {
+          list.push({ key: `parl-${parl}`, label: `Parlamentar: ${parl}`, clear: () => setSelectedParlamentares(selectedParlamentares.filter(item => item !== parl)) });
+        });
+
+        return list;
+      }, [filterAno, filterAnoRepasse, filterRP, filterFaixaValor, filterVigenciaAlerta, filterEmpenhados, filterNaoEmpenhados, filterRepassados, filterFaltaRepassar, search, selectedUFs, selectedProgramas, selectedParlamentares, currentYear]);
 
       // CONFIGURAÇÃO DOS GRÁFICOS
       const chartConfigs = useMemo(() => {
@@ -1594,7 +1640,7 @@
 
             <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2 sm:gap-3 no-print">
               <button
-                onClick={() => setIsLightMode(!isLightMode)}
+                onClick={toggleTheme}
                 className={`px-3 py-2 rounded-xl text-xs font-bold transition-all border flex items-center justify-center gap-1.5 ${isLightMode ? 'bg-white border-slate-300 text-slate-800 hover:bg-slate-50 shadow-sm' : 'bg-slate-900 border-slate-700 text-slate-200 hover:bg-slate-800'}`}
               >
                 {isLightMode ? '🌙 Modo Escuro' : '☀️ Modo Claro'}
@@ -1683,6 +1729,40 @@
                       />
                     </div>
                   </div>
+
+                  {/* MELHORIA 2: BARRA VISUAL DE FILTROS ATIVOS (CHIPS/BADGES) */}
+                  {activeFiltersList.length > 0 && (
+                    <div className={`flex flex-wrap items-center gap-2 pt-1 pb-2 border-b text-xs ${isLightMode ? 'border-slate-200' : 'border-slate-800'}`}>
+                      <span className={`font-bold text-[11px] uppercase tracking-wider mr-1 ${isLightMode ? 'text-slate-500' : 'text-slate-400'}`}>Filtros Ativos:</span>
+                      {activeFiltersList.map(filter => (
+                        <span
+                          key={filter.key}
+                          className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold border transition-all ${
+                            isLightMode 
+                              ? 'bg-blue-50 text-blue-900 border-blue-200 hover:bg-blue-100' 
+                              : 'bg-blue-950/60 text-sky-300 border-sky-800/60 hover:bg-blue-900/60'
+                          }`}
+                        >
+                          {filter.label}
+                          <button
+                            onClick={filter.clear}
+                            className={`w-3.5 h-3.5 rounded-full flex items-center justify-center text-[10px] font-black leading-none ${
+                              isLightMode ? 'bg-blue-200 hover:bg-blue-300 text-blue-950' : 'bg-sky-900 hover:bg-sky-800 text-white'
+                            }`}
+                            title="Remover este filtro"
+                          >
+                            ✕
+                          </button>
+                        </span>
+                      ))}
+                      <button
+                        onClick={handleResetFilters}
+                        className="text-[11px] text-rose-500 hover:text-rose-600 font-bold ml-2 hover:underline"
+                      >
+                        Limpar todos
+                      </button>
+                    </div>
+                  )}
 
                   <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-8 gap-2.5 sm:gap-3">
                     <MultiSelectDropdown
