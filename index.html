@@ -830,13 +830,28 @@
         setFileName(sourceName);
       };
 
-      // CARREGAMENTO INICIAL
+// CARREGAMENTO INICIAL AUTOMÁTICO VIA API DA VERCEL
       useEffect(() => {
         if (!isAuthenticated) return;
 
         const loadDefaultSheet = async () => {
           setIsLoading(true);
 
+          try {
+            // 1. Tenta buscar primeiro via API Serverless da Vercel
+            const apiResponse = await fetch('/api/data');
+            if (apiResponse.ok) {
+              const arrayBuffer = await apiResponse.arrayBuffer();
+              const wb = XLSX.read(arrayBuffer, { type: 'array' });
+              processWorkbook(wb, 'Planilha do Servidor (Automática)');
+              setIsLoading(false);
+              return;
+            }
+          } catch (e) {
+            console.log('Tentando rota local estática...');
+          }
+
+          // 2. Fallback local caso esteja rodando offline
           const nomesArquivos = [
             'Planilha de Emendas - Resumida.xlsx',
             'planilha-de-emendas-resumida.xlsx',
@@ -845,7 +860,6 @@
           ];
 
           let carregado = false;
-
           for (const nome of nomesArquivos) {
             try {
               const urlEncoded = `./${encodeURIComponent(nome)}`;
@@ -857,13 +871,11 @@
                 carregado = true;
                 break;
               }
-            } catch (err) {
-              // Tenta o próximo nome
-            }
+            } catch (err) {}
           }
 
           if (!carregado) {
-            console.log('Sem planilha padrão disponível no Vercel. Utilize o botão para subir o arquivo manualmente.');
+            console.log('Utilize o botão verde para subir o arquivo manualmente.');
           }
 
           setIsLoading(false);
@@ -871,7 +883,6 @@
 
         loadDefaultSheet();
       }, [isAuthenticated]);
-
       // LOGIN SEGURO VIA API DA VERCEL
       const handleLogin = async (e) => {
         e.preventDefault();
