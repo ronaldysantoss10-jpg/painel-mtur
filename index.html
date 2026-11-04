@@ -741,7 +741,7 @@
           const idxRepasseProposta = findColIdx(['valor de repasse da proposta', 'repasse da proposta', 'valor repasse', 'valor de repasse']);
           const idxGlobal = findColIdx(['valor global', 'total do plano', 'valor total', 'valor']);
           const idxEmpenho = findColIdx(['empenho', 'valor do empenho']);
-          const idxRepassado = findColIdx(['repassado', 'valor já repassado', 'pago']);
+          const idxRepassado = findColIdx(['situação do repasse', 'situacao do repasse', 'repasse financeiro', 'repassado', 'valor já repassado', 'pago']);
           const idxDataRepasse = findColIdx(['data do repasse', 'data repasse', 'data de pagamento', 'data pagamento', 'ano repasse']);
           const idxObs = findColIdx(['motivo', 'situação', 'observações', 'status', 'observacao']);
 
@@ -753,7 +753,21 @@
             const globalVal = idxGlobal !== -1 ? parseVal(row[idxGlobal]) : 0;
             const repassePropostaVal = idxRepasseProposta !== -1 ? parseVal(row[idxRepasseProposta]) : globalVal;
             let empenhoVal = instrumento === 'TED' ? globalVal : (idxEmpenho !== -1 ? parseVal(row[idxEmpenho]) : 0);
-            const repassadoVal = idxRepassado !== -1 ? parseVal(row[idxRepassado]) : 0;
+            
+            let repassadoVal = 0;
+            if (idxRepassado !== -1) {
+              const rawRepassado = row[idxRepassado];
+              if (typeof rawRepassado === 'boolean') {
+                repassadoVal = rawRepassado ? (repassePropostaVal || empenhoVal || globalVal) : 0;
+              } else {
+                const strRep = String(rawRepassado).toLowerCase().trim();
+                if (strRep === 'true' || strRep === 'sim' || strRep === 'v' || strRep === '1' || strRep === 'x' || strRep === 'ok') {
+                  repassadoVal = repassePropostaVal || empenhoVal || globalVal;
+                } else {
+                  repassadoVal = parseVal(rawRepassado);
+                }
+              }
+            }
 
             // ELIMINA DADOS ZERADOS FANTASMA
             if (globalVal === 0 && empenhoVal === 0 && repassadoVal === 0) {
